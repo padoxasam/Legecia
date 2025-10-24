@@ -1,7 +1,7 @@
 from django.db import models
-import AbstractUser from django.contrib.auth.models
+from django.contrib.auth.models import AbstractUser
 
-class user (AbstractUser):
+class User(AbstractUser):
 
     biometric_inf = models.CharField(max_length= 512 ,null=True)
     qr_token= models.CharField(max_length=512 , blank=True , null=True)

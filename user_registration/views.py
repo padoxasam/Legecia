@@ -1,12 +1,12 @@
 from django.shortcuts import render
 
 # Create your views here.
-import generics, permissions, status from rest_framework
-import Response from rest_framework
-import authenticate from django.contrib.auth 
-import RefreshToken from rest_framework_simplejwt.tokens
-import User from .models
-import RegisterSerializer from .serializers
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
+from .models import User
+from .serializers import RegisterSerializer
 
 class Register_view(generics, CreateAPIView):
     query=User.objects.all()
@@ -21,11 +21,11 @@ class LoginView (generics.GenericsAPIView):
         password= request.data.get('password')
         user = authenticate(username=username,password=password)
         if not user: 
-            return Response ( ['Error': 'Invalid Credentials'], status=status.HTTP_400_Bad_Request)
+            return Response ( {'Error': 'Invalid Credentials'}
+                             , status=status.HTTP_400_Bad_Request)
         
         refresh=RefreshToken.for_user(user)
         return Response ( {'Refresh' : str(refresh),
                            'Access'  : str(refresh.access_token),
-                           'user'    : ['username':user.username,'email':user.email
-                                        ]
+                           'user'    : {'username':user.username,'email':user.email}
                            })

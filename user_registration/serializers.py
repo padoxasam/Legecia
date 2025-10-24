@@ -1,22 +1,27 @@
-import serlializers from rest_framework
-import validate_password from django.contrib.auth.password_validation
-import user from .models
+from rest_framework import serializers
+from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth import get_user_model
 
-class Registerserializer(serlializers.Modelserilizer):
 
-    n_password=serlializers.CharField(write_only=True , required=True, validators=[validate_password])
-    re_password=serlializers.CharField(write_only=True , required=True, validators=[validate_password])
+User=get_user_model()
+class RegisterSerializer(serializers.ModelSerializer):
 
-    class meta:
+    n_password=serializers.CharField(write_only=True , required=True, validators=[validate_password])
+    re_password=serializers.CharField(write_only=True , required=True, validators=[validate_password])
+
+    class Meta:
         model=User 
-        fields = ( 'username', 'e-mail','n_password','re_password')
+        fields = ( 'username', 'email','n_password','re_password')
 
         def validate (self , attr):
-            if attr['n_passwprd'] != attr['re_password']:
-                raise serlializers.ValidationError(['password', 'Passwords do not match !']) 
+            if attr['n_password'] != attr['re_password']:
+                raise serializers.ValidationError({'password', 'Passwords do not match !'}) 
             return attr
 
         def create (self, validated_data):
-            validated_data.pop('re_password') 
-            user=User.object.create_user(**validated_data)
+            validated_data.pop('re_password')
+            password=validated_data.pop('n_password') 
+            user=User.objects.create_user(**validated_data)
+            user.set_password(password)
+            user.save()
             return user   
