@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path , include
-
+from django.http import HttpResponse
+from django.views.generic import RedirectView
+def home(request):
+    return HttpResponse("Welcome! ya 7g")
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path ('api/users/', include('user_registration.urls'))
+    path ('api/users/', include('user_registration.urls')),
+    path('',RedirectView.as_view(url='/api/users/register/',permanent=False)),
 ]
