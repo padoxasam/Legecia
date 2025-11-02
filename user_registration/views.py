@@ -29,7 +29,7 @@ class LoginView(generics.GenericAPIView):
                              , status=status.HTTP_400_BAD_REQUEST)
         
         refresh=RefreshToken.for_user(user)
-        return Response ( { 'Message' : 'Login Successful !'
+        return Response ( { 'Message' : 'Login Successful !',
                             'Refresh' : str(refresh),
                            'Access'  : str(refresh.access_token),
                            'user'    : {'username':user.username,'email':user.email}
