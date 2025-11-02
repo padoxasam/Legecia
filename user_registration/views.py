@@ -6,22 +6,23 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
+from django.contrib.auth import get_user_model
 from .serializers import RegisterSerializer
-
-class Register_view(generics, CreateAPIView):
+User= get_user_model()
+class RegisterView(generics.CreateAPIView):
     query=User.objects.all()
     serializer_class= RegisterSerializer
     permission=[permissions.AllowAny]
 
-class LoginView (generics.GenericsAPIView):
+class LoginView(generics.GenericAPIView):
     permission_class= [permissions.AllowAny]
 
-    def post (self, request):
+    def post(self, request):
         username=request.data.get('username')
         password= request.data.get('password')
         user = authenticate(username=username,password=password)
         if not user: 
-            return Response ( {'Error': 'Invalid Credentials'}
+            return Response ( {'Error': 'Invalid Credentials ❌'}
                              , status=status.HTTP_400_Bad_Request)
         
         refresh=RefreshToken.for_user(user)
