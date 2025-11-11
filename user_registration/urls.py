@@ -7,8 +7,7 @@ urlpatterns = [
     path('profile/update/',UpdateInfo.as_view(),name='Update'),
     path('verify-email/<uidb64>/<token>/',VerifyEmail.as_view(),name='verify_email'),
     
-    
-    
+     
     ]
 
 
