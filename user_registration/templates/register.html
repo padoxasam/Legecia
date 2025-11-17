@@ -1,10 +1,11 @@
-<html> < head><title>
-    Register ! 
+<h1>Register</h1>
 
-</title></head></html>
-<h3>
-    Create An Account 
-</h3>
-<form method=" Post " action="{% URL 'register'%}">
-    
-</form>--!
+<form method="POST">
+    {% csrf_token %}
+    {{ serializer.as_p }}
+    <button type="submit">Register</button>
+</form>
+
+<p style="margin-top:20px;">
+    Already have an account? 
+    <a href="/api/users/login/" style="color:red; font-weight:bold;">SIGN IN NOW</a></p>

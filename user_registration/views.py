@@ -12,19 +12,18 @@ from .token import email_token
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework.views import APIView
-
+from .serializers import LoginSerializer
 User= get_user_model()
 class RegisterView(generics.CreateAPIView):
     queryset=User.objects.all()
     serializer_class= RegisterSerializer
     permission_classes=[permissions.AllowAny]
-    def crite(self, serializer):
-    
+    def perform_create(self, serializer):
         user=serializer.save()
         email_token(user)
         return user
 class VerifyEmail(APIView):
-    def get(self,uid64,token):
+    def get(self,request,uid64,token):
         try :
             uid=urlsafe_base64_decode(uid64).decode()
             user=User.objects.get(pk=uid)
@@ -37,25 +36,26 @@ class VerifyEmail(APIView):
         else:
             return Response ({'Message':'Invalid or Exiperd Token'},status=400)    
 class LoginView(generics.GenericAPIView):
+    serializer_class=LoginSerializer
     permission_classes= [permissions.AllowAny]
 
     def post(self, request):
-        username=request.data.get('username')
-        password= request.data.get('password')
-        if not username or not password:
-            return Response({'Error': 'Please Provide Both username And password'}, status=status.HTTP_400_BAD_REQUEST)
-
-        user = authenticate(username=username,password=password)
-        if not user: 
-            return Response ( {'Error': 'Invalid Credentials ❌'}
-                             , status=status.HTTP_400_BAD_REQUEST)
-        
+        serializer = self.get_serializer(data=request.data)
+        serializer=LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user=serializer.validated_data['user']
         refresh=RefreshToken.for_user(user)
-        return Response ( { 'Message' : 'Login Successful !',
-                            'Refresh' : str(refresh),
-                           'Access'  : str(refresh.access_token),
-                           'user'    : {'username':user.username,'email':user.email}
-                           }, status=status.HTTP_200_OK)
+        return Response({'Message': 'Login Successful !',
+                        'access_token' : str(refresh.access_token),
+                        'refresh_token': str(refresh),
+                        'user': {'username': user.username,
+                                 'email' : user.email,
+                                 'full_name':user.full_name
+                                 }
+
+        },status=status.HTTP_200_OK)
+    
+       
 class View(generics.RetrieveAPIView):
     permission_classes=[IsAuthenticated] 
     def get(self,request,*args,**kwargs):

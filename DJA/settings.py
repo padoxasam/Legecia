@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'user_registration',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -75,12 +76,19 @@ WSGI_APPLICATION = 'DJA.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(default='postgresql://neondb_owner:npg_dA7UYDFOaWb5@ep-proud-king-a8jbhwdo-pooler.eastus2.azure.neon.tech/neondb?sslmode=require&channel_binding=require',
-        conn_max_age= 1000,
-        ssl_require=True )
-    
+DATABASES = {'default' : { 'ENGINE': 'django.db.backends.postgresql',
+                          'NAME' : 'neondb',
+                          'USER': 'neondb_owner',
+                          'PASSWORD': 'npg_dA7UYDFOaWb5',
+                          'HOST':'ep-proud-king-a8jbhwdo-pooler.eastus2.azure.neon.tech',
+                            'PORT':'5432',
+                            'OPTIONS': {'sslmode':'require'
+
+}                        
 }
+}
+    
+
 
 
 # Password validation

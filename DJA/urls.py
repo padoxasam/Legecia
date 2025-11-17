@@ -24,4 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path ('api/users/', include('user_registration.urls')),
     path('',RedirectView.as_view(url='/api/users/register/',permanent=False)),
+    path("api/auth/", include("user_registration.urls")),
+
 ]
