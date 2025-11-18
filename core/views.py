@@ -11,22 +11,27 @@ class ProfileView(APIView):
     permission_classes=[IsAuthenticated]
 
 
-    def get (self,request):
+    def get(self,request):
         user=request.user
-        acc=user.account_type
-
+        if user.is_superuser:
+            acc='USER'
+        else:
+            acc=user.account_type
+        data=self.fetch_profile(user.username,acc)
+        return Response(data)
+    def fetch_profile(self,username,acc):
         with connection.cursor() as cursor :
             if acc == 'USER':
-                cursor.execute('select * from user_info where u_username=%s',[user.username])
-            if acc=='BENEFICIARY':
-                cursor.execute('SELECT * FROM beneficiary where b_username=%s',[user.username])
-            if acc=='GUARDIAN':
-                cursor.execute('SELECT * FROM guardian_info WHERE g_username=%s',[user.username])
+                cursor.execute('select * from user_info where u_username=%s',[username])
+            elif acc=='BENEFICIARY':
+                cursor.execute('SELECT * FROM beneficiary where b_username=%s',[username])
+            elif acc=='GUARDIAN':
+                cursor.execute('SELECT * FROM guardian_info WHERE g_username=%s',[username])
             row=cursor.fetchone()
-        return Response({'data':row})
+        return row
     def put(self,request):
         user=request.user
-        acc=user.account_Type
+        acc=user.account_type
         serializer=ProfileSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data=serializer.validated_data
@@ -39,36 +44,47 @@ class ProfileView(APIView):
                                         u_dob = COALESCE(%s, u_dob),
                                         u_family_title = COALESCE(%s, u_family_title),
                                         fl_address = COALESCE(%s, fl_address),
-                                        u_bio = COALESCE(%s, u_bio) 
+                                        u_bio = COALESCE(%s, u_bio),
+                                        Nationality= coalesce(%s,nationality),
+                                        u_Region_ID =coalesce(%s,u_region_id),
+                                        
+
                                         where u_username=%s
                                ''',
-                                   [data.get['full_name'],
-                                    data.get('phone_num'),
-                                    data.get('gender'),
+                                   [data.get("full_name"),
+                                    data.get("phone_num"),
+                                    data.get("gender"),
                                     data.get("dob"),
                                     data.get("family_title"),
                                     data.get("address"),
                                     data.get("bio"),
+                                    data.get("nationality"),
+                                    data.get("region"),
                                     user.username
                                     ]                 )
-            elif acc='BENEFICIARY':
+            elif acc=='BENEFICIARY':
                 cursor.execute('''UPDATE beneficiary 
                                SET 
                         b_full_name = COALESCE(%s, b_full_name),
                         b_phone_num = COALESCE(%s, b_phone_num),
                         b_gender = COALESCE(%s, b_gender),
                         b_dob = COALESCE(%s, b_dob),
-                        b_family_title = COALESCE(%s, b_family_title)
+                        b_family_title = COALESCE(%s, b_family_title),
+                        b_u_relation = COALESCE(%s, b_u_relation),
+                        
+                               
                          WHERE b_username = %s
                                ''',[
                     data.get("full_name"),
-                    data.get("phone"),
+                    data.get("phone_num"),
                     data.get("gender"),
                     data.get("dob"),
                     data.get("family_title"),
+                    data.get('beneficiary_user_relation'),
+
                     user.username]
     ) 
-            elif acc=='GUARDIAN ':
+            elif acc=='GUARDIAN':
                 cursor.execute("""
                     UPDATE guardian_info
                     SET 
@@ -76,13 +92,19 @@ class ProfileView(APIView):
                         g_phone_num = COALESCE(%s, g_phone_num),
                         g_gender = COALESCE(%s, g_gender),
                         g_address = COALESCE(%s, g_address),
-                        bio = COALESCE(%s, bio)
+                        bio = COALESCE(%s, bio),
+                        relation_b = COALESCE(%s,b_g_id),
+                        relation_u = COALESCE(%s,u_g_id)
+                        
                     WHERE g_username = %s
                 """, [
                     data.get("full_name"),
-                    data.get("phone"),
+                    data.get("phone_num"),
                     data.get("gender"),
                     data.get("address"),
                     data.get("bio"),
+                    data.get("guardian_beneficiary_relation"),
+                    data.get("guardian_user_relation"),
+
                     user.username])
         return Response({'message':'Profile Updated Successfully'})
