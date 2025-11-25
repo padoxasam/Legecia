@@ -5,10 +5,10 @@ from user_registration.models import User,Beneficiary,Guardian
 
 class communicationMeans(models.Model):
     u=models.ForeignKey(User,on_delete=models.CASCADE)
-    b_u=models.ForeignKey(Beneficiary,on_delete==models.cascade)
+    b_u=models.ForeignKey(Beneficiary,on_delete=models.CASCADE)
     us_email=models.EmailField(max_length=100,unique=True)
     us_email=models.EmailField(max_length=100,unique=True)
-    packg=models.ForeignKey(Package,on_delete=models.CASCADE)
+    #packg=models.ForeignKey(Package,on_delete=models.CASCADE)
     relation_choices= ( 
                         ('MOTHER','MOTHER'),
                        ('FATHER','FATHER'),

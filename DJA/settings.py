@@ -42,6 +42,14 @@ INSTALLED_APPS = [
     'user_registration',
     'core',
     'communication',
+    'package',
+    'log.apps.LogConfig',
+    'milestone',
+    'supervised',
+    'Notification',
+    'access',
+    'explorer',
+    'credentials',
 ]
 
 MIDDLEWARE = [
