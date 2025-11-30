@@ -12,7 +12,9 @@ from .token import email_token
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework.views import APIView
-from .serializers import LoginSerializer
+from django.db import connection
+
+from .serializers import LoginSerializer,RoleSwitchSerializer
 User= get_user_model()
 class RegisterView(generics.CreateAPIView):
     queryset=User.objects.all()
@@ -74,4 +76,27 @@ class UpdateInfo(generics.UpdateAPIView):
         user.email=request.data.get('email',user.email)
         user.save()
         return Response ({'Message':"Profile Updated Successfully !"} )
-    
+class SwitchRoleView(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self,request):
+        serializer=RoleSwitchSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        new_role=serializer.validated_data['role']
+        user=request.user
+        has_role=False
+        username=user.username
+        with connection.cursor() as cursor:
+            if new_role=='USER':
+                has_role=True
+            elif new_role=='BENEFICIARY':
+                cursor.execute('SELECT 1 FROM beneficairy WHERE b_username = %s',[username])
+                has_role=cursor.fetchone() is not None
+            elif new_role=='GUARDIAN':
+                cursor.execute('select 1 from guardian_info where g_username= %s',[username])
+                has_role=cursor.fetchone() is not None
+        if not has_role:
+            return Response({'Error':f"You Dont't have a {new_role} profile !"},status=403)
+        user.active_role=new_role
+        user.save()
+        return Response({'Message':'Role Switched Successfully !',
+                        'active_role':new_role})

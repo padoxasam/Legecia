@@ -7,6 +7,10 @@ class User(AbstractUser):
     qr_token= models.CharField(max_length=512 , blank=True , null=True)
     device_verified =models.BooleanField(default=False)
     is_verified=models.BooleanField(default=False)
+    active_role=models.CharField(max_length=20,default='USER',
+                                 choices=[('USER','User'),
+                                          ('BENEFICIARY','Beneficiary'),
+                                          ('GUARDIAN','Guardian'), ])
 
     full_name=models.CharField(max_length=200, null=False,blank=True)
     def save(self,*args,**kwargs):
