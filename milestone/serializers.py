@@ -34,7 +34,7 @@ class MilestoneSerializer(serializers.Serializer):
                 raise serializers.ValidationError('Beneficiary Must Upload a Milestone file !')
             forma=os.path.splitext(file_bene.name)[1].lower().replace('.','')
             if forma not in self.bene_allowed_formats:
-                raise serializers.ValidationError(f'invalid file format for Beneficiary\n Allowed Formats:{', '.join(self.bene_allowed_formats)}')
+                raise serializers.ValidationError(f"invalid file format for Beneficiary\n Allowed Formats:{', '.join(self.bene_allowed_formats)}")
         else:
             raise serializers.ValidationError("You Aren't permissable to Upload Milestones !")
         return data

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import SupervisedPack
 
-class SupervisedPackSerializer(serializer.ModelSerializer):
+class SupervisedPackSerializer(serializers.ModelSerializer):
     class Meta:
         model=SupervisedPack
         fields='__all__'

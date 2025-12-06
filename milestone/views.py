@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import MilestoneUpload
+
 
 from .serializers import MilestoneSerializer
 from .models import Milestone
@@ -24,8 +24,8 @@ class BeneficiaryUploadMilestone(APIView):
 
     def post(self,request,milestone_id):
         try:
-            milestone=MilestoneUpload.objects.get(milestone_id=milestone_id)
-        except MilestoneUpload.DoesNotExist:
+            milestone=Milestone.objects.get(milestone_id=milestone_id)
+        except Milestone.DoesNotExist:
             return Response({'ERROR':'Milestone Not Found !'},status=404)
         serializer=MilestoneSerializer(milestone,data=request.data,partial=True)
         if serializer.is_valid():
@@ -36,8 +36,8 @@ class MilestoneDetails(APIView):
     permission_classes=[IsAuthenticated]
     def get(self,request,milestone_id):
         try:
-            milestone=MilestoneUpload.objects.get(milestone_id=milestone_id)
-        except MilestoneUpload.DoesNotExist:
+            milestone=Milestone.objects.get(milestone_id=milestone_id)
+        except Milestone.DoesNotExist:
             return Response({'Error':'Not Found !'},status=404)
         serializer=MilestoneSerializer(milestone)
         return Response(serializer.data)

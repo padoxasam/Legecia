@@ -5,10 +5,10 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .models import Package
-from .serializer import PackageSerializer
+from .serializers import PackageSeriializer
 class PackageListCreateView(generics.ListCreateAPIView):
     queryset=Package.objects.all()
-    serializer_class=PackageSerializer
+    serializer_class=PackageSeriializer
     permission_classes=[permissions.IsAuthenticated]
     def get_queryset(self):
         querys=super().get_queryset()
@@ -20,7 +20,7 @@ class PackageListCreateView(generics.ListCreateAPIView):
         serializer.save(owner=self.request.user)
 class PackageDetailsView(generics.RetrieveUpdateDestroyAPIView):
     queryset=Package.objects.all()
-    serializer_class=PackageSerializer
+    serializer_class=PackageSeriializer
     permission_classes=[permissions.IsAuthenticated]
     def get_object(self):
         object=get_object_or_404(Package,pk=self.kwargs.get('pk'))

@@ -33,6 +33,8 @@ urlpatterns = [
     path('api/access/',include('access.urls')),
     path('api/explorer/',include('explorer.urls')),
     path('api/credentials/',include('credentials.urls')),
+    path("", include("frontend.urls")),
+
 
 
 

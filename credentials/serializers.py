@@ -1,12 +1,12 @@
 # credentials/serializers.py
 from rest_framework import serializers
-from .models import Credential
+from .models import Credenntials
 
 class CredentialSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     
     class Meta:
-        model = Credential
+        model = Credenntials
         exclude = ("password_hashed", "password_salt")
     def validate(self, data):
         if len(data["password"]) < 8:

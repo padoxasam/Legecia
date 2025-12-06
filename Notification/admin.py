@@ -8,12 +8,13 @@ class NotificationAdmin(admin.ModelAdmin):
     list_display = (
         "noti_id",
         "topic",
-        "notification_type",
         "priority",
-        "sender_id",
-        "receiver_id",
+        'sender',
+        'receiver',
         "created_at",
         "is_seen",
+        
     )
+    
     list_filter = ("priority", "notification_type", "is_seen")
-    search_fields = ("topic", "message", "receiver_id")
+    search_fields = ("topic", "message")

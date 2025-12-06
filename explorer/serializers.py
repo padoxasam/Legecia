@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import PackExplorer
+from .models import PackageExplorer
 
 class PackExplorerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PackExplorer
+        model = PackageExplorer
         fields = "__all__"

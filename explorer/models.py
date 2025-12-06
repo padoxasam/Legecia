@@ -11,7 +11,7 @@ class PackageExplorer(models.Model):
 
     class Meta:
         db_table='pack_explorar'
-        oredering=['-posted_at']
+        ordering=['-posted_at']
 
     def __str__(self):
         return f'Public Package:{self.pack_name} by:{self.ownership}'
