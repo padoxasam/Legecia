@@ -4,7 +4,4 @@ from frontend.components.layout import Layout
 def HomePage():
     return Layout(html.div({'style':{'padding':'25px'}},html.h1('Welcome To Legecia'))
 
-
-
-
-    )
+)
