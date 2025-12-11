@@ -4,11 +4,11 @@ class IsUserRole(BasePermission):
 
     def has_permission(self, request, view):
         return request.user.active_role == 'USER'
-class IsUserRole(BasePermission):
+class IsBeneficiaryRole(BasePermission):
 
     def has_permission(self, request, view):
         return request.user.active_role == 'BENEFICIARY'
-class IsUserRole(BasePermission):
+class IsGuardianRole(BasePermission):
 
     def has_permission(self, request, view):
         return request.user.active_role == 'GUARDIAN'

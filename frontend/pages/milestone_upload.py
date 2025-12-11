@@ -56,7 +56,7 @@ def UploadMilestonePage(): # optimize ya 7g
         if not file_list:
             return html.div({"style":{"color":"#777"}}, "No files selected.")
         return html.div({"style":{"display":"flex","gap":"12px","flexWrap":"wrap"}},
-                        *[html.div({"style":{"width":"220px"}}, FilePreview(f), html.div({"style":{"fontSize":"12px","marginTop":"6px"}}, f["name"])) for f in file_list])
+                        *[html.div({"style":{"width":"220px"}}, filepreview(f), html.div({"style":{"fontSize":"12px","marginTop":"6px"}}, f["name"])) for f in file_list])
     return Layout(
         html.div(
             {"style":{"maxWidth":"900px","margin":"18px auto","padding":"20px","borderRadius":"10px","background":"#fff"}},

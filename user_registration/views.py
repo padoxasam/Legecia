@@ -89,7 +89,7 @@ class SwitchRoleView(APIView):
             if new_role=='USER':
                 has_role=True
             elif new_role=='BENEFICIARY':
-                cursor.execute('SELECT 1 FROM beneficairy WHERE b_username = %s',[username])
+                cursor.execute('SELECT 1 FROM beneficiary WHERE b_username = %s',[username])
                 has_role=cursor.fetchone() is not None
             elif new_role=='GUARDIAN':
                 cursor.execute('select 1 from guardian_info where g_username= %s',[username])

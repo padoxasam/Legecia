@@ -1,6 +1,6 @@
 from reactpy import component, html, hooks
 from frontend.components.layout import Layout
-from frontend.components.milestone_helper import FilePreview
+from frontend.components.milestone_helper import filepreview
 
 @component
 def MilestoneDetailsPage(milestone_id:int= None):
@@ -38,7 +38,7 @@ def MilestoneDetailsPage(milestone_id:int= None):
             html.div({"style":{"color":"#666"}}, f"Family: {data['family']} — Created by: {data['created_by']}"),
             html.hr(),
             html.h3("Reference Documents"),
-            html.div({"style":{"display":"flex","gap":"12px"}}, *[FilePreview(f) for f in ref_files]),
+            html.div({"style":{"display":"flex","gap":"12px"}}, *[filepreview(f) for f in ref_files]),
             html.hr(),
             html.h3("Beneficiary Uploads"),
             html.div(
@@ -50,7 +50,7 @@ def MilestoneDetailsPage(milestone_id:int= None):
                         ),
                         html.div(
                             {"style":{"display":"flex","gap":"8px","alignItems":"center"}},
-                            FilePreview(u["file"]),
+                            filepreview(u["file"]),
                             html.div(
                                 {},
                                 html.button({"onClick": lambda _u=u: verify_upload(_u["id"]), "style":{"marginRight":"8px"}}, "Verify"),

@@ -10,7 +10,7 @@ def exit_of(filename:str)-> str:
     if not filename or '.' not in filename:
         return ''
     return filename.rsplit('.',1)[1].lower()
-def validate_file_role(filename:str,role:str)->(bool,str):
+def validate_file_role(filename:str,role:str)->(bool.str):
     exit=exit_of(filename)
     if role == 'USER':
         ok=exit in user_allowed_forma

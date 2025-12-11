@@ -6,7 +6,7 @@ urlpatterns = [
     path('profile/',View.as_view() , name='Profile'),
     path('profile/update/',UpdateInfo.as_view(),name='Update'),
     path('verify-email/<uidb64>/<token>/',VerifyEmail.as_view(),name='verify_email'),
-    path('api/switch-role/',SwitchRoleView.as_view(),name='View Switch')
+    path('switch-role/',SwitchRoleView.as_view(),name=' Switch role ')
      
     ]
 
