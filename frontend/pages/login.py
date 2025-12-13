@@ -66,5 +66,5 @@ def LoginPage():
            ),     
 
         ),
-            html.p({'style':{'marginTop':"20px", 'color':'##6c5898'}},message),
+            html.p({'style':{'marginTop':"20px", 'color':'#6c5898'}},message),
     )

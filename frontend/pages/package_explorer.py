@@ -2,7 +2,7 @@ from reactpy import component,html,hooks
 from reactpy_django.hooks import use_query
 from frontend.components.layout import Layout
 from frontend.components.package_public_card import PublicPackageCard
-from frontend.components.neon import NeonCard, NeonButton, TerminalHeader
+from frontend.components.neon import TerminalHeader
 
 API_EXPLORE_URL='http://127.0.0.1:8000/api/explorer/'
 @component

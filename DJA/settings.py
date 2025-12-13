@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+from datetime import timedelta
+
 import dj_database_url
 from pathlib import Path
 
@@ -50,7 +52,19 @@ INSTALLED_APPS = [
     'access',
     'explorer',
     'credentials',
+    'frontend',
+    'channels',
+    'reactpy_django',
+    'legecia-frontend',
+    
+
+    
 ]
+
+REACTPY_REGISTERED_ROOT_COMPONENTS = [
+    "frontend.components.App.App",
+]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -148,3 +162,9 @@ REST_FRAMEWORK = {
 }
 EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL='no-reply@legecia.com'
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(minutes=45),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+}

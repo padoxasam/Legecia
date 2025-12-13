@@ -32,14 +32,20 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Invalid account type")
         return val
 
-    def validate_email2(self,id):
+    def validate_email(self,id):
         if '@' not in id:
-            raise serializers.ValidationError('Invalid E-mail Address ❌')
+            raise serializers.ValidationError('Invalid E-mail Address  Format❌')
+        if User.objects.filter(email=id).exists():
+            
+            raise serializers.ValidationError('Email Already Registered !')
         return id
     def password_Validation (self , attr):
         if attr['n_password'] != attr['r_password']:
             raise serializers.ValidationError({'password', 'Passwords do not match !'}) 
         return attr
+    
+
+
     def password_policy (self, val):
         if len(val) < 8 :
             raise serializers.ValidationError('Password Must be Greater Than 8 Characters !')    
@@ -84,22 +90,22 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return user
 class LoginSerializer(serializers.Serializer):
-    identifier=serializers.CharField(required=True)
+    username=serializers.CharField(required=True)
     password=serializers.CharField(required=True,write_only=True)
 
     def validate(self,data):
-        identifier=data.get('identifier')
+        username=data.get('username')
         password=data.get('password')
-        if not identifier or not password:
+        if not username or not password:
             raise serializers.ValidationError('Both Fields are Required')
-        if '@'in identifier:
+        if '@'in username:
             try:
-                user_obj=User.objects.get(email__iexact=identifier)
+                user_obj=User.objects.get(email__iexact=username)
                 username=user_obj.username
             except User.DoesNotExist:
                 raise serializers.ValidationError('Invalid Credentials !')
         else:
-            username=identifier
+            username=username
         user=authenticate(username=username,password=password)
         if not user:
             raise serializers.ValidationError('Invalid Credentials !')

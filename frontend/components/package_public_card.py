@@ -11,9 +11,7 @@ def PublicPackageCard(pkg):
                 "border": "2px solid #00eaff",
                 "boxShadow": "0 0 15px #00eaff",
                 "color": "#fff",
-                "fontFamily": "Orbitron",
-            }
-        },
+                "fontFamily": "Orbitron",}},
         html.h3({"style": {"color": "#00eaff"}}, pkg.get("packa_name")),
         html.p({}, f"Family: {pkg.get('family_nickname')}"),
         html.p({}, f"Public: {'Yes' if pkg.get('is_public') else 'No'}"),

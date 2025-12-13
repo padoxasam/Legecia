@@ -1,6 +1,6 @@
 from reactpy import component, html, hooks
 from reactpy_django.hooks import use_query
-from frontend.components.package_card import PackageCard
+from frontend.components.package_public_card import PublicPackageCard
 from frontend.components.package_form import PackageForm
 @component
 def PackagePage():
@@ -63,7 +63,7 @@ html.div(
             (
                 html.p("Loading packages...") if loading else
                 html.p("No packages found.") if not packages else
-                html.div(*[PackageCard(p) for p in packages])
+                html.div(*[PublicPackageCard(p) for p in packages])
             ),
         ),
     )
