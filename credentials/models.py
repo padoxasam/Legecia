@@ -2,13 +2,19 @@ from django.db import models
 
 # Create your models here.
 from log.models import Log
-import uuid
-class Credenntials(models.Model):
+from django.contrib.auth import get_user_model
+
+User=get_user_model
+class Credentials(models.Model):
     credential_id=models.AutoField(primary_key=True)
+    user = models.OneToOneField(    
+        User,
+        on_delete=models.CASCADE,
+        related_name="credentials")
     log=models.ForeignKey(Log,on_delete=models.CASCADE,null=True,blank=True)
     username=models.CharField(max_length=200,unique=True)
     password_hashed=models.TextField()
-    password_salt=models.TextField()
+    password_salt=models.BinaryField()
     security_qu1=models.CharField(max_length=200)
     security_qu2=models.CharField(max_length=200)
     security_ans1=models.CharField(max_length=200)
@@ -21,7 +27,7 @@ class Credenntials(models.Model):
     failed_entry=models.IntegerField(default=0)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at= models.DateTimeField(auto_now=True)
-class Meta:
-    db_table='credentials'
-def __str__(self):
-    return f'Credentials For {self.username}'
+    class Meta:
+        db_table='credentials'
+    def __str__(self):
+        return f'Credentials For {self.username}'

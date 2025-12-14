@@ -21,20 +21,23 @@ class MilestoneSerializer(serializers.Serializer):
 ]
     def validate(self, data):
         user=self.context['request'].user
+        role=user.active_role
         file_user=data.get('user_reference_file')
         file_bene=data.get('beneficiary_file')
-        if user.account_type=='USER':
+        if role =='USER':
+                
             if not file_user:
                 raise serializers.ValidationError('User Must Upload a Reference Docuements !')
+            
             forma=os.path.splitext(file_user.name)[1].lower().replace('.','')
             if forma not in self.user_allowed_formats:
                 raise serializers.ValidationError(f"invalid file format for User\n Allowed Formats:{', '.join(self.user_allowed_formats)}")
-        elif user.account_type=='BENEFICIARY':
+        elif role =='BENEFICIARY':
             if not file_bene:
                 raise serializers.ValidationError('Beneficiary Must Upload a Milestone file !')
             forma=os.path.splitext(file_bene.name)[1].lower().replace('.','')
             if forma not in self.bene_allowed_formats:
                 raise serializers.ValidationError(f"invalid file format for Beneficiary\n Allowed Formats:{', '.join(self.bene_allowed_formats)}")
         else:
-            raise serializers.ValidationError("You Aren't permissable to Upload Milestones !")
+            raise serializers.ValidationError("Your Active Role Doesnt permit Milestone Uploads")
         return data

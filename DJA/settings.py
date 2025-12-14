@@ -52,9 +52,9 @@ INSTALLED_APPS = [
     'access',
     'explorer',
     'credentials',
-    'frontend',
+    
     'channels',
-    'reactpy_django',
+    
     'legecia-frontend',
     
 
@@ -162,9 +162,10 @@ REST_FRAMEWORK = {
 }
 EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL='no-reply@legecia.com'
+# settings.py
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFRESH_TOKEN_LIFETIME": timedelta(minutes=45),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }

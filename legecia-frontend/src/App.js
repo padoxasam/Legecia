@@ -35,7 +35,15 @@ function App() {
             </AuthGuard>
           }
         />
-
+        {/* ✅ ROLE SMART ENTRY (INSERT HERE) */}
+          <Route
+          path="/dashboard"
+        element={
+          <AuthGuard>
+          <RoleRedirect />
+        </AuthGuard>
+          }
+    />
         {/* USER DASHBOARD */}
         <Route
           path="/dashboard"

@@ -1,13 +1,16 @@
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 from django.dispatch import receiver
 from django.utils import timezone
+from .models import AccessLog
 
 from log.models import Log
 from .services import create_access_log, close_access_log
 @receiver(user_logged_in)
+
+
 def access_log_login(sender,user,request,**kwargs):
-    ip=request.META.get('REMOTE_ADDR')
-    device=request.META.get('HTTO_USER_AGENT')
+    ip=request.META.get('REMOTE_ADDR','0.0.0.0')
+    device=request.META.get('HTTPO_USER_AGENT')
     try:
         latest_log=Log.objects.filter(visitor_id=user.id).latest('log_at')
     except Log.DoesNotExist:
@@ -30,7 +33,7 @@ def access_log_logout(sender, user, request, **kwargs):
         close_access_log(entry)
     except AccessLog.DoesNotExist:
         pass
-receiver(user_login_failed)
+@receiver(user_login_failed)
 def access_log_failed(sender, credentials, request, **kwargs):
     ip = request.META.get("REMOTE_ADDR", "0.0.0.0")
     device = request.META.get("HTTP_USER_AGENT", "")

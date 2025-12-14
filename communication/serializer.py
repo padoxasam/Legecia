@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import communicationMeans
+from .models import CommunicationMeans
 class CommunicationSerializer(serializers.ModelSerializer):
     class meta:
-        model = communicationMeans
+        model = CommunicationMeans
         fields='__all__'
         

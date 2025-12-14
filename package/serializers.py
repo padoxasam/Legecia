@@ -12,13 +12,14 @@ class PackageSeriializer(serializers.ModelSerializer):
                   'pack_type','total_files','has_expiry','expiry_at','unlocked','description'
                   
         ]
+        
         read_only_fields= ['pack_id','total_files','unlocked']
     def validate(self, attrs): # llexpiry
-        has_expiry=data.get('has_expiry',getattr(self.instance,'has_expiry',False))
-        expiry=data.get("expiry_at",getattr(self.instance,'expiry_at',None))
+        has_expiry=attrs.get('has_expiry',getattr(self.instance,'has_expiry',False))
+        expiry=attrs.get("expiry_at",getattr(self.instance,'expiry_at',None))
         if has_expiry and not expiry:
             raise serializers.ValidationError('Expiry Date is Required ! ')
-        return data 
+        return attrs 
     def create(self,validated_data):
         if 'uploaded_on' not in validated_data:
             validated_data['uploaded_on']=timezone.now().date()

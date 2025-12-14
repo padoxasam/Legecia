@@ -5,14 +5,12 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate,get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User,Beneficiary,Guardian
-from .serializers import RegisterSerializer
 from rest_framework.permissions import IsAuthenticated
 from .token import email_token 
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework.views import APIView
-from django.db import connection
-from .serializers import LoginSerializer,RoleSwitchSerializer
+from .serializers import LoginSerializer,RoleSwitchSerializer,RegisterSerializer,UpdateProfileSerializer
 User= get_user_model()
 class RegisterView(generics.CreateAPIView):
     queryset=User.objects.all()
@@ -32,7 +30,7 @@ class VerifyEmail(APIView):
             return Response({'Error':'Invalid Link'},status=400)
         if default_token_generator.check_token(user,token):
             user.email_verified=True
-            user.save(update_fields={'email_verified'})
+            user.save(update_fields=['email_verified'])
             return Response({'Message':'Email Verified Successfully'})
         else:
             return Response ({'Message':'Invalid or Exiperd Token'},status=400)  
@@ -56,7 +54,7 @@ class LoginView(generics.GenericAPIView):
         return Response({'Message': 'Login Successful !',
                         'access_token' : str(refresh.access_token),
                         'refresh_token': str(refresh),
-                        'user': {'id': user.username,
+                        'user': {'id': user.id,
                                  'email' : user.email,
                                  'active_role': user.active_role
                                  }
@@ -64,9 +62,9 @@ class LoginView(generics.GenericAPIView):
         },status=status.HTTP_200_OK)
     
        
-class View(generics.RetrieveAPIView):
+class ProfileView(generics.RetrieveAPIView):
     permission_classes=[IsAuthenticated] 
-    def get(self,request,*args,**kwargs):
+    def get(self,request):
         user=request.user
         return Response({'id':user.id,
             'username':user.username,
@@ -77,15 +75,13 @@ class View(generics.RetrieveAPIView):
 
         })  
 class UpdateInfo(generics.UpdateAPIView):
+    serializer_class=UpdateProfileSerializer
     permission_classes=[IsAuthenticated]
-    def put(self,request,*args,**kwargs):
-        user=request.user
-        user.username=request.data.get('username',user.username)
-        user.email=request.data.get('email',user.email)
-        if 'email' in request.data:
-            user.email_verified=False
-        user.save()
-        return Response ({'Message':"Profile Updated Successfully !"} )
+    def get(self,request,*args,**kwargs):
+        return self.request.user
+        
+        
+    
 class SwitchRoleView(APIView):
     permission_classes=[IsAuthenticated]
     def post(self,request):

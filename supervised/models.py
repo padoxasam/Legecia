@@ -37,5 +37,10 @@ class SupervisedPack(models.Model):
     remarks=models.TextField(null=True,blank=True)
     class Meta:
         db_table='supervised_packs'
+    def save(self,*args,**kwargs):
+        if self.pack:
+            self.pack_name= self.pack.pack_name
+        super().save(*args,**kwargs)
+        
     def __str__(self):
-        return f'supervision for Package: {self.pck.pack_name}'
+        return f'supervision for Package: {self.pack.pack_name}'

@@ -25,7 +25,6 @@ log_acions=[("LOGIN_SUCCESS", "User login success"),
 class Log(models.Model):
     log_id=models.AutoField(primary_key=True)
 
-    visitor_type=models.CharField(max_length=50,choices=visitor_type_choices)
     visitor_id=models.IntegerField()
     ip_address=models.GenericIPAddressField()
     log_action=models.CharField(max_length=100,choices=log_acions)

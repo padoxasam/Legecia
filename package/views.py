@@ -1,4 +1,3 @@
-from django.shortcuts import render
 
 # Create your views here.
 from rest_framework import generics, permissions, status
@@ -17,23 +16,35 @@ class PackageListCreateView(generics.ListCreateAPIView):
             querys=querys.filter(owner_id=owner_id)
         return querys
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        serializer.save(owner_id=self.request.user.id)
+
 class PackageDetailsView(generics.RetrieveUpdateDestroyAPIView):
-    queryset=Package.objects.all()
     serializer_class=PackageSeriializer
     permission_classes=[permissions.IsAuthenticated]
-    def get_object(self):
-        object=get_object_or_404(Package,pk=self.kwargs.get('pk'))
-        return object
-    def put(self,request,*args,**kwargs):
-        object=self.get_object()
 
-        if object.owner != request.user and not request.user.is_staff:
-            return response ({'details':'Not Allowed !'}, status=status.HTTP_403_FORBIDDEN
-                             )
-        return super().put(request,*args,**kwargs)
-    def delete(self,request,*args,**kwargs):
-        object=self.get_object ()
-        if obj.owner !=request.user and not request.user.is_stuff:
-            return Response({'Details': 'Not Allowed ! '}, status=status.HTTP_403_FORBIDDEN)
-        return super().delete(request,*args, **kwargs)
+    def get_queryset(self):
+        return Package.objects.all()
+    def get_object(self):
+        return get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
+
+    
+    
+    def update(self, request, *args, **kwargs):
+        package = self.get_object()
+
+        if package.owner_id != request.user.id and not request.user.is_staff:
+            return Response(
+                {"detail": "Not allowed"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        return super().update(request, *args, **kwargs)
+    def destroy(self, request, *args, **kwargs):
+        package = self.get_object()
+        if package.owner_id != request.user.id and not request.user.is_staff:
+            return Response(
+                {"detail": "Not allowed"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        return super().destroy(request, *args, **kwargs)

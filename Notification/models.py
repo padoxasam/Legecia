@@ -5,14 +5,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.utils import timezone
 
-notification_types=[ ('EMAIL','EMAIL'),
-                    ('Push','Push'),
-                    ('In App','In App'),
-                    ('SMS','SMS'),
-                    ('System','System'),
-                    ('Unlock','Unlock'),
+NOTIFICATION_TYPE = 'SYSTEM'
 
-]
 priority_choices=  [('Low', '🟢 Low'),
                      ('Medium','"🟠 Medium'),
                      ('High','🔴 High'),
@@ -20,16 +14,10 @@ priority_choices=  [('Low', '🟢 Low'),
                      ]
 class Notification(models.Model):
     noti_id=models.AutoField(primary_key=True)
-    sender_content_type=models.ForeignKey(ContentType,on_delete=models.CASCADE,related_name='Notification_Senders',null=True,blank=True)
-    sender_object_id=models.PositiveBigIntegerField(null=True,blank=True)
-    sender=GenericForeignKey('sender_content_type','sender_object_id')
-    receiver_content_type=models.ForeignKey(ContentType,on_delete=models.CASCADE,related_name='Notification_Receivers',null=True,blank=True)
-    receiver_object_id=models.PositiveBigIntegerField(null=True,blank=True)
-    receiver=GenericForeignKey('receiver_content_type','receiver_object_id')
     log=models.ForeignKey('log.Log',on_delete=models.CASCADE,null=True,blank=True)
     visitor_type=models.CharField(max_length=50,blank=True,null=True)
     topic=models.CharField(max_length=150)
-    notification_type=models.CharField(max_length=30,choices=notification_types)
+    notification_type = models.CharField(max_length=20,default=NOTIFICATION_TYPE,editable=False)    
     message=models.TextField()
     created_at=models.DateTimeField(auto_now_add=True)
     read_at=models.DateTimeField(null=True,blank=True)
