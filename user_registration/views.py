@@ -1,11 +1,10 @@
 from django.shortcuts import render
 
-# Create your views here.
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from django.contrib.auth import authenticate,get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User
+from .models import User,Beneficiary,Guardian
 from .serializers import RegisterSerializer
 from rest_framework.permissions import IsAuthenticated
 from .token import email_token 
@@ -13,7 +12,6 @@ from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework.views import APIView
 from django.db import connection
-
 from .serializers import LoginSerializer,RoleSwitchSerializer
 User= get_user_model()
 class RegisterView(generics.CreateAPIView):
@@ -25,6 +23,7 @@ class RegisterView(generics.CreateAPIView):
         email_token(user)
         return user
 class VerifyEmail(APIView):
+    permission_classes=[permissions.AllowAny]
     def get(self,request,uid64,token):
         try :
             uid=urlsafe_base64_decode(uid64).decode()
@@ -32,27 +31,34 @@ class VerifyEmail(APIView):
         except( TypeError,ValueError,OverflowError,User.DoesNotExist):
             return Response({'Error':'Invalid Link'},status=400)
         if default_token_generator.check_token(user,token):
-            user.is_verified=True
-            user.save()
+            user.email_verified=True
+            user.save(update_fields={'email_verified'})
             return Response({'Message':'Email Verified Successfully'})
         else:
-            return Response ({'Message':'Invalid or Exiperd Token'},status=400)    
+            return Response ({'Message':'Invalid or Exiperd Token'},status=400)  
+          
 class LoginView(generics.GenericAPIView):
     serializer_class=LoginSerializer
     permission_classes= [permissions.AllowAny]
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
-        serializer=LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user=serializer.validated_data['user']
+        if not user.email_verified:
+           
+            return Response(
+                {'error': 'Please verify your email before login'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         refresh=RefreshToken.for_user(user)
         return Response({'Message': 'Login Successful !',
                         'access_token' : str(refresh.access_token),
                         'refresh_token': str(refresh),
-                        'user': {'username': user.username,
+                        'user': {'id': user.username,
                                  'email' : user.email,
-                                 'full_name':user.full_name
+                                 'active_role': user.active_role
                                  }
 
         },status=status.HTTP_200_OK)
@@ -65,7 +71,9 @@ class View(generics.RetrieveAPIView):
         return Response({'id':user.id,
             'username':user.username,
                          'email': user.email,
-                            'id': user.id
+                         'email_verified':user.email_verified,
+                         'active_role':user.active_role
+                            
 
         })  
 class UpdateInfo(generics.UpdateAPIView):
@@ -74,6 +82,8 @@ class UpdateInfo(generics.UpdateAPIView):
         user=request.user
         user.username=request.data.get('username',user.username)
         user.email=request.data.get('email',user.email)
+        if 'email' in request.data:
+            user.email_verified=False
         user.save()
         return Response ({'Message':"Profile Updated Successfully !"} )
 class SwitchRoleView(APIView):
@@ -81,22 +91,28 @@ class SwitchRoleView(APIView):
     def post(self,request):
         serializer=RoleSwitchSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        
         new_role=serializer.validated_data['role']
         user=request.user
-        has_role=False
-        username=user.username
-        with connection.cursor() as cursor:
-            if new_role=='USER':
-                has_role=True
-            elif new_role=='BENEFICIARY':
-                cursor.execute('SELECT 1 FROM beneficiary WHERE b_username = %s',[username])
-                has_role=cursor.fetchone() is not None
-            elif new_role=='GUARDIAN':
-                cursor.execute('select 1 from guardian_info where g_username= %s',[username])
-                has_role=cursor.fetchone() is not None
-        if not has_role:
-            return Response({'Error':f"You Dont't have a {new_role} profile !"},status=403)
+        if new_role == 'USER':
+            user.active_role = 'USER'
+            user.save(update_fields=['active_role'])
+            return Response({'message': 'Switched to USER role'})
+
+        if new_role == 'BENEFICIARY':
+            if not Beneficiary.objects.filter(user_id=user.id).exists():
+                return Response({'error': 'Beneficiary profile not found'}, status=403)
+        if new_role == 'GUARDIAN':
+            if not Guardian.objects.filter(user_id=user.id).exists():
+                return Response({'error': 'Guardian profile not found'}, status=403)
+
+        
+        
         user.active_role=new_role
-        user.save()
-        return Response({'Message':'Role Switched Successfully !',
-                        'active_role':new_role})
+        user.save(update_fields=['active_role'])
+        return Response({
+            'message': 'Role switched successfully',
+            'active_role': new_role
+        })
+
+    

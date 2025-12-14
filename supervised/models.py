@@ -10,13 +10,26 @@ packyia_Types=[    ('LOCKED','Locked Supervision'),
 Guardian_status=[('Pending','Waiting for Guardian Sign up'),
                     ('Active','Active Guardian'),]
 User_status= [('Active','Active'),('Departed','Passed Away'),]
+STATUS_CHOICES = [
+        ('Draft', 'Draft'),
+        ('Pending', 'Pending Approval'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
 class SupervisedPack(models.Model):
-    pack=models.OneToOneField(Package,on_delete=models.CASCADE)
+    pack = models.OneToOneField(
+        Package,
+        on_delete=models.CASCADE,
+        related_name='supervision') 
+    pack_name = models.CharField(max_length=50, null=True, blank=True)  # New field
+   
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     bene=models.ForeignKey(Beneficiary,on_delete=models.CASCADE)
     guard=models.ForeignKey(Guardian,on_delete=models.CASCADE)
     packat=models.CharField(max_length=50 ,choices=packyia_Types)
-    guadian_control=models.BooleanField(default=True)
+    supervision_end = models.DateTimeField(null=True, blank=True)
+    supervision_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Draft')
+
     guardian_revealing=models.BooleanField(default=False)
     created_at=models.DateTimeField(auto_now_add=True)
     guard_stat=models.CharField(max_length=20,choices=Guardian_status)

@@ -9,44 +9,31 @@ from django.db import connection
 account_type_tuple=[
     ('USER','User'),
              ('BENEFICIARY','Beneficiary'),
-             ('GUARDIAN','Guardian'),
-
-]
+             ('GUARDIAN','Guardian'),]
 User=get_user_model()
 class RegisterSerializer(serializers.ModelSerializer):
 
     n_password=serializers.CharField(write_only=True , required=True, validators=[validate_password],style={'input_type': 'password'})
     r_password=serializers.CharField(write_only=True , required=True, validators=[validate_password],style={'input_type': 'password'})
-    account_type= serializers.ChoiceField(choices=account_type_tuple, write_only=True,required=True,allow_null=False,allow_blank=False)
 
     class Meta:
         model=User 
-        fields = ( 'username', 'email','n_password','r_password','account_type',)
-        resetting={'account_type':{'default':None}}
-    def validate_email(self,value):
+        fields = ( 'username', 'email','n_password','r_password')
+    from rest_framework import serializers
+
+    def validate_email(self, value):
+        if '@' not in value:
+            raise serializers.ValidationError('Invalid E-mail Address Format ❌')
+
+        if self.instance and self.instance.email == value:
+            return value
+
         if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError('Email Already Registered')
+            raise serializers.ValidationError('Email Already Registered!')
+        return value
 
-    def validate_account_type(self, val):
-        if val not in ["USER", "BENEFICIARY", "GUARDIAN"]:
-            raise serializers.ValidationError("Invalid account type")
-        return val
-
-    def validate_email(self,id):
-        if '@' not in id:
-            raise serializers.ValidationError('Invalid E-mail Address  Format❌')
-        if User.objects.filter(email=id).exists():
-            
-            raise serializers.ValidationError('Email Already Registered !')
-        return id
-    def password_Validation (self , attr):
-        if attr['n_password'] != attr['r_password']:
-            raise serializers.ValidationError({'password', 'Passwords do not match !'}) 
-        return attr
     
-
-
-    def password_policy (self, val):
+    def validate_n_password(self, val):
         if len(val) < 8 :
             raise serializers.ValidationError('Password Must be Greater Than 8 Characters !')    
         if not re.search(r'[A-Z]', val):
@@ -56,7 +43,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         if not re.search(r"[!@#$%^&*_+-?></(\)'\"]",val):
             raise serializers.ValidationError('Password Must contain at least one special Character [e.g:!@#$%^&*]')
         return val
-    
+    def validate(self , attr):
+        if attr['n_password'] != attr['r_password']:
+            raise serializers.ValidationError({'password', 'Passwords do not match !'}) 
+        return attr
     def create(self, validated_data):
         validated_data.pop('r_password')
         password = validated_data.pop('n_password')

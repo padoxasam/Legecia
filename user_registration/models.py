@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
+    email_verified = models.BooleanField(default=False)
 
     biometric_inf = models.CharField(max_length= 512 ,null=True)
     qr_token= models.CharField(max_length=512 , blank=True , null=True)
@@ -12,6 +13,7 @@ class User(AbstractUser):
                                           ('BENEFICIARY','Beneficiary'),
                                           ('GUARDIAN','Guardian'), ])
 
+    
     full_name=models.CharField(max_length=200, null=False,blank=True)
     def save(self,*args,**kwargs):
         if not self.full_name:
@@ -24,7 +26,8 @@ class User(AbstractUser):
         return self.username
 
 class Beneficiary(models.Model):
-    b_full_name = models.CharField(max_length=255)
+    user=models.OneToOneField(User,on_delete=models.CASCADE,related_name='beneficairy_profile')
+    b_full_name=models.CharField(max_length=255)
     b_email = models.EmailField()
     b_username = models.CharField(max_length=255)
 
@@ -34,6 +37,9 @@ class Guardian(models.Model):
     g_full_name = models.CharField(max_length=255)
     g_email = models.EmailField()
     g_username = models.CharField(max_length=255)
-
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='guardian_profile')
     def __str__(self):
         return self.g_username
