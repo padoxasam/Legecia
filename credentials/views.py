@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.utils import timezone
+from rest_framework_simplejwt.tokens import RefreshToken
 
 # Create your views here.
 from rest_framework.views import APIView
@@ -19,7 +20,7 @@ class RegisterCredentialView(APIView):
         password = serializer.validated_data.pop("password")
         salt = generate_salt()
         hashed = hash_password(password, salt)
-        user=User.objects.get(id=request.user.id)
+        user=request.user
         if hasattr(user, "credentials"):
             return Response(
                 {"error": "Credentials already exist for this user"},
@@ -33,7 +34,7 @@ class RegisterCredentialView(APIView):
             two_factor_token=generate_2fa_token(),
             **serializer.validated_data)
         return Response({"message": "Credentials created"}, status=status.HTTP_201_CREATED)
-class LoginCredemtialView(APIView):
+class LoginCredentialView(APIView):
     def post(self,request):
         username = request.data.get("username")
         password = request.data.get("password")
@@ -45,9 +46,16 @@ class LoginCredemtialView(APIView):
         if not verify_password(password, cred.password_hashed, cred.password_salt):
             cred.failed_entry += 1
             cred.save(update_fields=["failed_entry"])
+           
             return Response({"error": "Invalid credentials"}, status=400)
+        if cred.two_factor:
+            return Response({'2fa_required':True,'token':cred.two_factor_token})
+        
         cred.last_seen = timezone.now()
         cred.save(update_fields=["last_seen"])
-        if cred.two_factor:
-            return Response({"2fa_required": True, "token": cred.two_factor_token})
-        return Response({"login": "success"})
+        return Response({
+            "access": str(RefreshToken.access_token),   
+            "refresh": str(RefreshToken),                
+            "role": cred.user.acive_role,         
+            "username": cred.user.username
+        })

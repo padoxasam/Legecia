@@ -20,17 +20,14 @@ class User(AbstractUser):
             self.full_name = f'{self.first_name}{self.last_name}'.strip()
         super().save(*args,**kwargs)
 
-
-
     def __str__(self):
         return self.username
-
 class Beneficiary(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE,related_name='beneficairy_profile')
     b_full_name=models.CharField(max_length=255)
     b_email = models.EmailField()
     b_username = models.CharField(max_length=255)
-
+    relation_to_user=models.CharField(max_length=50)
     def __str__(self):
         return self.b_username    
 class Guardian(models.Model):
@@ -41,5 +38,6 @@ class Guardian(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='guardian_profile')
+    relation_to_user=models.CharField(max_length=50)
     def __str__(self):
         return self.g_username

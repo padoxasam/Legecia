@@ -1,12 +1,16 @@
 from django.urls import path
-from .views import ProfileView, ProfileUpdateView
+from .views import (
+    CoreProfileView,
+    UserDashboardView,
+    BeneficiaryDashboardView,
+    GuardianDashboardView,
+)
 
 urlpatterns = [
-    path("profile/", ProfileView.as_view(), name="profile"),
-    path("profile/update/", ProfileUpdateView.as_view(), name="profile_update"),
-    path('api/users/', include('user_registration.urls')),
+    path('profile/', CoreProfileView.as_view()),
 
-    path('api/packages/', include('package.urls')),
-    path('api/communication/',include('communication.urls')),
-    
+    # Dashboards
+    path('dashboard/user/', UserDashboardView.as_view()),
+    path('dashboard/beneficiary/', BeneficiaryDashboardView.as_view()),
+    path('dashboard/guardian/', GuardianDashboardView.as_view()),
 ]

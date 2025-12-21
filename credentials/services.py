@@ -11,8 +11,15 @@ def generate_salt():
 
 
 def hash_password(password,salt):
-    decodekey=hashlib.pbkdf2_hmac('sha256',password.encode(),salt,PBKDF2_ITERATIONS)
-    return base64.b64encode(decodekey).decode()
+   
+   dk = hashlib.pbkdf2_hmac(           
+        'sha256',
+        password.encode(),
+        salt,
+        PBKDF2_ITERATIONS)
+   return base64.b64encode(dk).decode()
+
+    
 def verify_password(password,hash,salt):
     return hmac.compare_digest(hash,hash_password(password,salt))
 def generate_2fa_token():
