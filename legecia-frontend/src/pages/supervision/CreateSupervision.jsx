@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
-import axios from "../../api/axios";
+// pages/supervision/CreateSupervision.jsx
+
+import { useState } from "react";
+import axios from "api/axios"; 
 import { motion } from "framer-motion";
-import GlassCard from "../../components/ui/GlassCard";
-import NeonButton from "../../components/ui/NeonButton";
+import GlassCard from "components/GlassCard";
+import NeonButton from "components/NeonButton";
 
 export default function CreateSupervision() {
   const [form, setForm] = useState({
@@ -10,7 +12,6 @@ export default function CreateSupervision() {
     bene: "",
     guard: "",
     packat: "LOCKED",
-    guadian_control: true,
     guardian_revealing: false,
     days: 30,
     remarks: ""
@@ -25,31 +26,42 @@ export default function CreateSupervision() {
   };
 
   const handleSubmit = async () => {
-    const expiry = new Date();
-    expiry.setDate(expiry.getDate() + Number(form.days));
+    // 🔐 calculate supervision_end
+    const end = new Date();
+    end.setDate(end.getDate() + Number(form.days));
 
-    await axios.post("/api/supervision/create/", {
-      ...form,
-      guard_stat: "Pending",
-      user_stat: "Active",
-      expires_at: expiry.toISOString().split("T")[0]
+    // 1️⃣ Create Draft
+    const res = await axios.post("/api/supervision/create/", {
+      pack: form.pack,
+      bene: form.bene,
+      guard: form.guard,
+      packat: form.packat,
+      guardian_revealing: form.guardian_revealing,
+      supervision_end: end.toISOString(),
+      remarks: form.remarks
     });
+
+    const supervisionId = res.data.data.id;
+
+    // 2️⃣ Send to guardian
+    await axios.post(`/api/supervision/send/${supervisionId}/`);
   };
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <GlassCard title="Request Supervision">
-        
+
+        {/* TODO: populate dynamically */}
         <select name="pack" onChange={handleChange}>
-          <option>Select Package</option>
+          <option value="">Select Package</option>
         </select>
 
         <select name="guard" onChange={handleChange}>
-          <option>Select Guardian</option>
+          <option value="">Select Guardian</option>
         </select>
 
         <select name="bene" onChange={handleChange}>
-          <option>Select Beneficiary</option>
+          <option value="">Select Beneficiary</option>
         </select>
 
         <select name="packat" onChange={handleChange}>
@@ -59,25 +71,28 @@ export default function CreateSupervision() {
         </select>
 
         <label>
-          Guardian Can Control
-          <input type="checkbox" name="guadian_control" checked={form.guadian_control} onChange={handleChange} />
-        </label>
-
-        <label>
-          Guardian Can Reveal Content
-          <input type="checkbox" name="guardian_revealing" checked={form.guardian_revealing} onChange={handleChange} />
+          Guardian Can Reveal
+          <input
+            type="checkbox"
+            name="guardian_revealing"
+            checked={form.guardian_revealing}
+            onChange={handleChange}
+          />
         </label>
 
         <input
           type="number"
-          min="30"
-          max="100"
+          min="1"
           name="days"
           value={form.days}
           onChange={handleChange}
         />
 
-        <textarea name="remarks" onChange={handleChange} />
+        <textarea
+          name="remarks"
+          placeholder="Remarks"
+          onChange={handleChange}
+        />
 
         <NeonButton onClick={handleSubmit}>
           Send Request

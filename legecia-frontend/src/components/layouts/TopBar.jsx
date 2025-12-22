@@ -1,4 +1,4 @@
-import LogoutButton from "../auth/LogoutButton";
+import LogoutButton from "components/LogoutButton";
 
 export default function TopBar() {
   return (

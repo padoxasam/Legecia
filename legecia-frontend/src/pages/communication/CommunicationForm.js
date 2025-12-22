@@ -1,5 +1,6 @@
 import { useState } from "react";
-import axios from "../../../utils/axios";
+import axios from "api/axios"; 
+
 
 const inputStyle = {
   width: "100%",

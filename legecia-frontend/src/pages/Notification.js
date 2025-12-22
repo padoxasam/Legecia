@@ -1,8 +1,8 @@
 // src/pages/NotificationsPage.js
 import { useEffect, useState } from "react";
-import api from "../utils/api";
-import CyberLayout from "../layouts/CyberLayout";
-import NotificationCard from "../components/NotificationCard";
+import api from "utils/api";
+import CyberLayout from "components/layouts/CyberLayout";
+import NotificationCard from "components/NotificationCard";
 
 function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);

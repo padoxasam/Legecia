@@ -1,0 +1,7 @@
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'legecia-frontend', 'build', 'static'),
+]
+
+TEMPLATES[0]['DIRS'] = [
+    os.path.join(BASE_DIR, 'legecia-frontend', 'build'),
+]

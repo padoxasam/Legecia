@@ -1,13 +1,16 @@
+// pages/supervision/GuardianReview.jsx
+
 import { useEffect, useState } from "react";
-import axios from "../../api/axios";
-import GlassCard from "../../components/ui/GlassCard";
-import NeonButton from "../../components/ui/NeonButton";
+import axios from "api/axios"; 
+import GlassCard from "components/GlassCard";
+import NeonButton from "components/NeonButton";
 
 export default function GuardianReview() {
   const [requests, setRequests] = useState([]);
 
   useEffect(() => {
-    axios.get("/api/supervision/guardian/pending/")
+    axios
+      .get("/api/supervision/guardian/pending/")
       .then(res => setRequests(res.data));
   }, []);
 
@@ -17,31 +20,27 @@ export default function GuardianReview() {
   };
 
   return (
-    <div>
+    <>
       {requests.map(req => (
-        <GlassCard key={req.id} title={`Package #${req.pack}`}>
-          <p>User: {req.user}</p>
-          <p>Beneficiary: {req.bene}</p>
-          <p>Type: {req.packat}</p>
+        <GlassCard key={req.id} title={req.pack_name}>
 
-          <label>
-            Allow Control
-            <input
-              type="checkbox"
-              defaultChecked={req.guadian_control}
-              onChange={e =>
-                req.guadian_control = e.target.checked
-              }
-            />
-          </label>
+          <p>User ID: {req.user}</p>
+          <p>Beneficiary ID: {req.bene}</p>
+          <p>Mode: {req.packat}</p>
 
           <label>
             Reveal Content
             <input
               type="checkbox"
-              defaultChecked={req.guardian_revealing}
+              checked={req.guardian_revealing}
               onChange={e =>
-                req.guardian_revealing = e.target.checked
+                setRequests(prev =>
+                  prev.map(r =>
+                    r.id === req.id
+                      ? { ...r, guardian_revealing: e.target.checked }
+                      : r
+                  )
+                )
               }
             />
           </label>
@@ -49,10 +48,12 @@ export default function GuardianReview() {
           <NeonButton
             onClick={() =>
               updateRequest(req.id, {
+                supervision_status: "Approved",
                 guard_stat: "Active",
                 guardian_revealing: req.guardian_revealing
               })
-            }>
+            }
+          >
             Approve
           </NeonButton>
 
@@ -60,14 +61,16 @@ export default function GuardianReview() {
             danger
             onClick={() =>
               updateRequest(req.id, {
-                guard_stat: "Rejected",
+                supervision_status: "Rejected",
                 remarks: "Rejected by guardian"
               })
-            }>
+            }
+          >
             Reject
           </NeonButton>
+
         </GlassCard>
       ))}
-    </div>
+    </>
   );
 }

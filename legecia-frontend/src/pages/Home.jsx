@@ -1,10 +1,9 @@
-import Layout from "../components/layout/Layout";
-
+import CyberLayout from "components/layouts/CyberLayout";
 export default function Home() {
   return (
-    <Layout>
+    <CyberLayout>
       <h2>Welcome to LEGECIA</h2>
       <p>Secure digital legacy platform</p>
-    </Layout>
+    </CyberLayout>
   );
 }

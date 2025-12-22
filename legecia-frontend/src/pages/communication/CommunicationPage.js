@@ -1,6 +1,6 @@
-import TopBar from "../../../components/layout/TopBar";
-import CreateCommunicationForm from "./CreateCommunicationForm";
-import CommunicationList from "./CommunicationList";
+import TopBar from "components/layouts/TopBar";
+import CreateCommunicationForm from "pages/communication/CommunicationForm";
+import CommunicationList from "pages/communication/CommunicationList";
 
 export default function CommunicationPage() {
   return (

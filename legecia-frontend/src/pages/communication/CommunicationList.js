@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "../../../utils/axios";
+import axios from "api/axios"; 
+
 
 export default function CommunicationList() {
   const [items, setItems] = useState([]);

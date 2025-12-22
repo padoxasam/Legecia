@@ -1,5 +1,5 @@
 // src/layouts/CyberLayout.js
-import LogoutButton from "../components/LogoutButton";
+import LogoutButton from "components/LogoutButton";
 
 function CyberLayout({ children }) {
   return (
