@@ -16,8 +16,8 @@ class UserCreateMilestone(APIView):
     def post(self,request):
         serializer=MilestoneSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(user=request.user, beneficiary=None)
-            return Response(serializer.errors,status=400)
+            milestone=serializer.save()
+            return Response(MilestoneSerializer(milestone).data, status=201)
 class BeneficiaryUploadMilestone(APIView):
     permission_classes=[IsAuthenticated,IsBene]
 

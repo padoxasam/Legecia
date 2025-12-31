@@ -10,7 +10,7 @@ from .services import create_access_log, close_access_log
 
 def access_log_login(sender,user,request,**kwargs):
     ip=request.META.get('REMOTE_ADDR','0.0.0.0')
-    device=request.META.get('HTTPO_USER_AGENT')
+    device=request.META.get('HTTPP_USER_AGENT')
     try:
         latest_log=Log.objects.filter(visitor_id=user.id).latest('log_at')
     except Log.DoesNotExist:

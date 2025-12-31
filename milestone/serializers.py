@@ -19,6 +19,11 @@ class MilestoneSerializer(serializers.Serializer):
     "webp", "bmp","tiff", "tif","pdf",
     "mp4", "mov", "avi", "mkv", "wav"
 ]
+    user_reference_file=serializers.FileField(required=False)
+    beneficiary_file=serializers.FileField(required=False)
+    class Meta:
+        model=Milestone
+        fields='__all__'
     def validate(self, data):
         user=self.context['request'].user
         role=user.active_role

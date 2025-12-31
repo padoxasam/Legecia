@@ -1,15 +1,6 @@
 from rest_framework.permissions import BasePermission
 
-class IsUserRole(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.active_role == 'USER'
-
-
-class IsBeneficiaryRole(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.active_role == 'BENEFICIARY'
-
-
-class IsGuardianRole(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.active_role == 'GUARDIAN'
+class IsNotificationOwner(BasePermission):
+   
+    def has_object_permission(self, request, view, obj):
+        return obj.receiver_object_id == request.user.id

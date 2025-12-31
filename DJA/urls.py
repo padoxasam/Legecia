@@ -15,14 +15,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path , include
+from django.urls import path , include,re_path
 from django.http import HttpResponse
-from django.views.generic import RedirectView
+from django.views.generic import TemplateView
+
 def home(request):
     return HttpResponse("Welcome! ya 7g")
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path ('api/users/', include('user_registration.urls')),
+    path("api/", include("user_registration.urls")),
     path('',include('frontend.urls')),
     path('api/package/',include('package.urls')),
     path("api/log/", include("log.urls")),
@@ -32,7 +33,7 @@ urlpatterns = [
     path('api/access/',include('access.urls')),
     path('api/explorer/',include('explorer.urls')),
     path('api/credentials/',include('credentials.urls')),
-    path("", include("frontend.urls")),
+    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
 
 
 

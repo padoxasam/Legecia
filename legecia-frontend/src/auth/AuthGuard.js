@@ -1,12 +1,15 @@
-import { useAuth } from "../context/AuthContext";
+// auth/AuthGuard.js
+import { Navigate } from "react-router-dom";
+import { useAuth } from "context/AuthContext";
 
 export default function AuthGuard({ children }) {
   const { user } = useAuth();
 
-  // DEV FALLBACK
   if (!user) {
-    return children;
+    return <Navigate to="/login" replace />;
   }
+if (!user.email_verified)
+    return <Navigate to="/login" />;
 
   return children;
 }

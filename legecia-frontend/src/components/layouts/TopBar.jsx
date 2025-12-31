@@ -1,6 +1,15 @@
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import LogoutButton from "components/LogoutButton";
+import { AuthContext } from "context/AuthContext";
+import logo from "../assets/logo.png";
 
 export default function TopBar() {
+  const navigate = useNavigate();
+  const { auth } = useContext(AuthContext);
+
+  const isAuthenticated = !!auth?.access;
+
   return (
     <div
       style={{
@@ -12,10 +21,29 @@ export default function TopBar() {
         backdropFilter: "blur(12px)",
       }}
     >
-      <h3 style={{ color: "#00ffff", letterSpacing: "2px" }}>
-        LEGECIA
-      </h3>
-      <LogoutButton />
+      {/* LOGO ONLY */}
+      <div
+        onClick={() => navigate("/")}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          cursor: "pointer",
+        }}
+      >
+        <img
+          src={logo}
+          alt="Legecia Logo"
+          style={{
+            height: "56px",           // 🔥 bigger
+            width: "56px",
+            objectFit: "contain",
+            background: "transparent", // 🔥 no white fill
+            filter: "drop-shadow(0 0 10px rgba(0,255,255,0.8))",
+          }}
+        />
+      </div>
+
+      {isAuthenticated && <LogoutButton />}
     </div>
   );
 }

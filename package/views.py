@@ -16,7 +16,7 @@ class PackageListCreateView(generics.ListCreateAPIView):
             querys=querys.filter(owner_id=owner_id)
         return querys
     def perform_create(self, serializer):
-        serializer.save(owner_id=self.request.user.id)
+        serializer.save(owner=self.request.user.id)
 
 class PackageDetailsView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class=PackageSeriializer

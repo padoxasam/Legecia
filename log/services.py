@@ -1,3 +1,4 @@
+from .models import Log
 def create_log(user, log_action, ip_address, **kwargs):
     Log.objects.create(
         user=user,

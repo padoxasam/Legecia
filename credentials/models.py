@@ -3,12 +3,13 @@ from django.db import models
 # Create your models here.
 from log.models import Log
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 User=get_user_model
 class Credentials(models.Model):
     credential_id=models.AutoField(primary_key=True)
     user = models.OneToOneField(    
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="credentials")
     log=models.ForeignKey(Log,on_delete=models.CASCADE,null=True,blank=True)

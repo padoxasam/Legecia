@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 User=settings.AUTH_USER_MODEL
 class CoreProfile(models.Model):
-    user=models.OneToOneField(User,on_delete=models.CASCADE,related_name='core profile')
+    user=models.OneToOneField(User,on_delete=models.CASCADE,related_name='core_profile')
     phone_num=models.CharField(max_length=15)
     gender=models.CharField(max_length=10)
     dob=models.DateField(null=True,blank=True)

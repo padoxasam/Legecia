@@ -4,17 +4,18 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AuthGuard from "auth/AuthGuard";
 import RoleGuard from "auth/RoleGuard";
 import RoleRedirect from "auth/RoleRedirect";
-
+import VerifySuccess from "pages/VerifySuccess";
 /* ================= LAYOUT ================= */
 import CyberLayout from "components/layouts/CyberLayout";
 
 /* ================= PUBLIC ================= */
 import Login from "pages/Login";
+import Register from "pages/Register";
 
 /* ================= CORE ================= */
 import Home from "pages/Home";
 import Notification from "pages/Notification";
-
+import VerifyEmail from "pages/Verify";
 /* ================= DASHBOARDS ================= */
 import UserDashboard from "pages/UserDashboard";
 import GuardianDashboard from "pages/GuardianDashboard";
@@ -35,25 +36,34 @@ import CommunicationPage from "pages/communication/CommunicationPage";
 /* ================= ADMIN ================= */
 import AccessLogsPage from "pages/admin/AccessLogsPage";
 import CredentialsPage from "pages/admin/CredentialsPage";
-import SystemLogsPage from "pages/admin/SystemLogsPage";
-
-/* ================= MILESTONE ================= */
-import CreateMilestone from "pages/milestone/CreateMilestone";
-import UploadMilestone from "pages/milestone/UploadMilestone";
-import MilestoneDetail from "pages/milestone/MilestoneDetails";
-
-/* ================= PACKAGES ================= */
-import PackagesPage from "pages/packages/PackagesPage";
 
 function App() {
   return (
     <Router>
       <Routes>
 
-        {/* ===== PUBLIC ===== */}
-        <Route path="/login" element={<Login />} />
+        {/* ================= PUBLIC ================= */}
+        <Route
+          path="/login"
+          element={
+            <CyberLayout>
+              <Login />
+            </CyberLayout>
+          }
+        />
 
-        {/* ===== ROLE REDIRECT ===== */}
+        <Route
+          path="/register"
+          element={
+            <CyberLayout>
+              <Register />
+            </CyberLayout>
+          }
+        />
+        {/* ✅ EMAIL VERIFICATION (PUBLIC) */}
+<Route path="/verify/:uid/:token" element={<VerifyEmail />} />
+<Route path="/verify-success" element={<VerifySuccess />} />
+        {/* ================= ROLE REDIRECT ================= */}
         <Route
           path="/dashboard"
           element={
@@ -63,7 +73,7 @@ function App() {
           }
         />
 
-        {/* ===== HOME ===== */}
+        {/* ================= HOME ================= */}
         <Route
           path="/"
           element={
@@ -75,7 +85,7 @@ function App() {
           }
         />
 
-        {/* ===== USER ===== */}
+        {/* ================= USER ================= */}
         <Route
           path="/user/dashboard"
           element={
@@ -102,7 +112,7 @@ function App() {
           }
         />
 
-        {/* ===== GUARDIAN ===== */}
+        {/* ================= GUARDIAN ================= */}
         <Route
           path="/guardian/dashboard"
           element={
@@ -129,7 +139,7 @@ function App() {
           }
         />
 
-        {/* ===== BENEFICIARY ===== */}
+        {/* ================= BENEFICIARY ================= */}
         <Route
           path="/beneficiary/dashboard"
           element={
@@ -142,8 +152,6 @@ function App() {
             </AuthGuard>
           }
         />
-
-        {/* ===== NOTIFICATIONS ===== */}
         <Route
           path="/notifications"
           element={
@@ -154,8 +162,7 @@ function App() {
             </AuthGuard>
           }
         />
-
-        {/* ===== COMMUNICATION ===== */}
+        {/* ================= COMMUNICATION ================= */}
         <Route
           path="/communication"
           element={
@@ -167,7 +174,7 @@ function App() {
           }
         />
 
-        {/* ===== EXPLORER ===== */}
+        {/* ================= EXPLORER ================= */}
         <Route
           path="/explorer"
           element={
@@ -201,15 +208,7 @@ function App() {
           }
         />
 
-        {/* ===== MILESTONE ===== */}
-        <Route path="/milestone/create" element={<CreateMilestone />} />
-        <Route path="/milestone/upload/:milestoneId" element={<UploadMilestone />} />
-        <Route path="/milestone/:milestoneId" element={<MilestoneDetail />} />
-
-        {/* ===== PACKAGES ===== */}
-        <Route path="/packages" element={<PackagesPage />} />
-
-        {/* ===== ADMIN ===== */}
+        {/* ================= ADMIN ================= */}
         <Route
           path="/admin/access-logs"
           element={
@@ -236,17 +235,9 @@ function App() {
           }
         />
 
-        <Route
-          path="/logs"
-          element={
-            <AuthGuard>
-              <SystemLogsPage />
-            </AuthGuard>
-          }
-        />
-
       </Routes>
     </Router>
   );
 }
+
 export default App;

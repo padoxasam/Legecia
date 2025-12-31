@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import SupervisedPack
 from .serializers import SupervisedPackSerializer
-from .permissions import IsUserCreator,IsGuardian,IsBeneficiaryView
+from .permissions import IsUserCreator,IsBeneficiaryView
 from django.shortcuts import get_object_or_404
 
 class CreateSupervision(APIView):

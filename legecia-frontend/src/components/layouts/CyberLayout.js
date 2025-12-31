@@ -1,32 +1,29 @@
 // src/layouts/CyberLayout.js
-import LogoutButton from "components/LogoutButton";
+import VantaBackground from "components/VantaBackground";
+import TopBar from "./TopBar";
 
 function CyberLayout({ children }) {
+
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "radial-gradient(circle at top, #020024, #00010F)",
+        position: "relative", 
         color: "#e0e0ff",
         fontFamily: "Orbitron",
+        overflow: "hidden",
       }}
     >
-      {/* Top bar */}
-      <div
-        style={{
-          padding: "15px 30px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          borderBottom: "1px solid rgba(0,255,255,0.3)",
-        }}
-      >
-        <h3 style={{ color: "#00ffff" }}>LEGECIA</h3>
-        <LogoutButton />
-      </div>
+      <VantaBackground />
 
-      {/* Page content */}
-      <div style={{ padding: "30px" }}>{children}</div>
+      <div style={{ position: "relative", zIndex: 10 }}>
+        {/* ✅ SINGLE TOP BAR (no duplication) */}
+        <TopBar />
+
+        <div style={{ padding: "30px" }}>
+          {children}
+        </div>
+      </div>
     </div>
   );
 }

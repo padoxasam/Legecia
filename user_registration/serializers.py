@@ -1,104 +1,161 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.password_validation import validate_password
-from rest_framework import serializers
-from django.contrib.auth import authenticate, get_user_model
-import re 
+import re
 
-account_type_tuple=[
-    ('USER','User'),
-             ('BENEFICIARY','Beneficiary'),
-             ('GUARDIAN','Guardian'),]
-User=get_user_model()
+User = get_user_model()
+
+
+# =========================
+# REGISTER SERIALIZER
+# =========================
 class RegisterSerializer(serializers.ModelSerializer):
-
-    n_password=serializers.CharField(write_only=True , required=True, validators=[validate_password],style={'input_type': 'password'})
-    r_password=serializers.CharField(write_only=True , required=True, validators=[validate_password],style={'input_type': 'password'})
+    password1 = serializers.CharField(
+        write_only=True,
+        required=True,
+        validators=[validate_password],
+        style={"input_type": "password"},
+    )
+    password2 = serializers.CharField(
+        write_only=True,
+        required=True,
+        validators=[validate_password],
+        style={"input_type": "password"},
+    )
 
     class Meta:
-        model=User 
-        fields = ( 'username', 'email','n_password','r_password')
+        model = User
+        fields = ("username", "email", "password1", "password2")
 
+    # ---------- EMAIL VALIDATION ----------
     def validate_email(self, value):
-        
-        if '@' not in value:
-            raise serializers.ValidationError('Invalid E-mail Address Format ❌')
+        if "@" not in value:
+            raise serializers.ValidationError("Invalid email address format")
 
-        if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError('Email Already Registered!')
-        
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("Email already registered")
+
         return value
 
-    
-    def validate_n_password(self, val):
-        if len(val) < 8 :
-            raise serializers.ValidationError('Password Must be Greater Than 8 Characters !')    
-        if not re.search(r'[A-Z]', val):
-            raise serializers.ValidationError('Password Must Contain at least one Upper-Case Letter [A-Z]')
-        if not re.search(r'\d',val):
-            raise serializers.ValidationError('Password Must Contain at Least One digit (0-9) ')
-        if not re.search(r"[!@#$%^&*_+-?></(\)'\"]",val):
-            raise serializers.ValidationError('Password Must contain at least one special Character [e.g:!@#$%^&*]')
-        return val
-    def validate(self , attr):
-        if attr['n_password'] != attr['r_password']:
-            raise serializers.ValidationError({'password', 'Passwords do not match !'}) 
-        return attr
+    # ---------- PASSWORD VALIDATION ----------
+    def validate_password1(self, value):
+        return self._validate_password(value)
+
+    def validate_password2(self, value):
+        return self._validate_password(value)
+
+    def _validate_password(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError(
+                "Password must be at least 8 characters long"
+            )
+        if not re.search(r"[A-Z]", value):
+            raise serializers.ValidationError(
+                "Password must contain at least one uppercase letter"
+            )
+        if not re.search(r"\d", value):
+            raise serializers.ValidationError(
+                "Password must contain at least one digit"
+            )
+        if not re.search(r"[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>/?]", value):
+            raise serializers.ValidationError(
+                "Password must contain at least one special character"
+            )
+        return value
+
+    # ---------- MATCH PASSWORDS ----------
+    def validate(self, attrs):
+        if attrs["password1"] != attrs["password2"]:
+            raise serializers.ValidationError({
+                "password2": "Passwords do not match"
+            })
+        return attrs
+
+    # ---------- CREATE USER ----------
     def create(self, validated_data):
-        validated_data.pop('r_password')
-        password = validated_data.pop('n_password')
+        password = validated_data.pop("password1")
+        validated_data.pop("password2")
 
         user = User.objects.create_user(**validated_data)
         user.set_password(password)
-        user.active_role='USER'
+
+        user.active_role = "USER"
+        user.email_verified = False
         user.save()
+
         return user
 
-        
-class LoginSerializer(serializers.Serializer):
-    username=serializers.CharField(required=True)
-    password=serializers.CharField(required=True,write_only=True)
 
-    def validate(self,data):
-        username=data.get('username')
-        password=data.get('password')
+# =========================
+# LOGIN SERIALIZER
+# =========================
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(required=True, write_only=True)
+
+    def validate(self, data):
+        username = data.get("username")
+        password = data.get("password")
+
         if not username or not password:
-            raise serializers.ValidationError('Both Fields are Required')
-        if '@'in username:
+            raise serializers.ValidationError("Both fields are required")
+
+        # Allow login with email or username
+        if "@" in username:
             try:
-                user_obj=User.objects.get(email__iexact=username)
-                username=user_obj.username
+                user_obj = User.objects.get(email__iexact=username)
+                username = user_obj.username
             except User.DoesNotExist:
-                raise serializers.ValidationError('Invalid Credentials !')
-        else:
-            username=username
-        user=authenticate(username=username,password=password)
+                raise serializers.ValidationError("Invalid credentials")
+
+        user = authenticate(username=username, password=password)
         if not user:
-            raise serializers.ValidationError('Invalid Credentials !')
-        data['user']=user
+            raise serializers.ValidationError("Invalid credentials")
+
+        data["user"] = user
         return data
+
+
+# =========================
+# ROLE SWITCH SERIALIZER
+# =========================
 class RoleSwitchSerializer(serializers.Serializer):
-    role=serializers.ChoiceField(choices=['USER','BENEFICIARY','GUARDIAN'])
+    role = serializers.ChoiceField(
+        choices=["USER", "BENEFICIARY", "GUARDIAN"]
+    )
+
+
+# =========================
+# UPDATE PROFILE SERIALIZER
+# =========================
 class UpdateProfileSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ["username", "email"]
 
     def validate_email(self, value):
         user = self.instance
-
-        if User.objects.filter(email=value).exclude(id=user.id).exists():
+        if (
+            User.objects
+            .filter(email__iexact=value)
+            .exclude(id=user.id)
+            .exists()
+        ):
             raise serializers.ValidationError("Email already in use")
-
         return value
 
     def update(self, instance, validated_data):
-        email = validated_data.get('email')
+        email = validated_data.get("email")
 
+        # Reset email verification if email changes
         if email and email != instance.email:
             instance.email_verified = False
+            instance.email = email
 
-        instance.username = validated_data.get('username', instance.username)
-        instance.email = email or instance.email
+        instance.username = validated_data.get(
+            "username", instance.username
+        )
+
         instance.save()
-
         return instance
