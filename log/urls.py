@@ -1,4 +1,7 @@
-from django.urls import path 
-from .views import LogListView
+from django.urls import path
+from .views import LogListView, MyLogListView
 
-urlpatterns=[path("log/", LogListView.as_view(), name="log_list"),]
+urlpatterns = [
+    path("", LogListView.as_view(), name="log-list"),
+    path("my/", MyLogListView.as_view(), name="my-log-list"),
+]

@@ -1,39 +1,54 @@
-from django.shortcuts import render
-
-# Create your views here.
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 from .models import SupervisedPack
 from .serializers import SupervisedPackSerializer
-from .permissions import IsUserCreator,IsBeneficiaryView
+from .permissions import IsUserCreator, IsBeneficiaryView
 from django.shortcuts import get_object_or_404
 
+
 class CreateSupervision(APIView):
-    permission_classes=[IsAuthenticated,IsUserCreator]
-    def post(self,request):
-        
-        serializer=SupervisedPackSerializer(data=request.data ,context={'request':request})
+    permission_classes = [IsAuthenticated, IsUserCreator]
+
+    def post(self, request):
+        serializer = SupervisedPackSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save(supervision_status='Draft')
-        return Response({'message': 'Supervised Package Created As draft !','data':serializer.data})
-class SendSupervisionRequest(APIView):
-    permission_classes=[IsAuthenticated,IsUserCreator]
-    def post(self,request,supervision_id):
-        obj=get_object_or_404(SupervisedPack,pk=supervision_id,user=request.user)
-        if obj.supervision_status !='Draft':
-            return Response({'error': 'Only draft packages can be sent'}, status=400)
-        obj.supervision_status='Pending'
-        obj.save(update_fields=['supervision_status'])
-        serializer=SupervisedPackSerializer(obj)
-        return Response ({'message': 'Supervision request sent to guardian',
-            'data': serializer.data})
-class BeneficiaryViewSupevision(APIView):
-    permission_classes=[IsAuthenticated,IsBeneficiaryView]
-    def get (self,request,superivision_id):
-        object=get_object_or_404(SupervisedPack,pk=superivision_id)
-        if object.beneficairy_id !=request.user.id:
-            return Response({'Error': 'Action Prohibited!'},status=403)
-        serializer=SupervisedPackSerializer(object)
-        return Response(serializer.data)
+        return Response(
+            {'message': 'Supervised Package Created As Draft!', 'data': serializer.data},
+            status=status.HTTP_201_CREATED,
+        )
 
+
+class SendSupervisionRequest(APIView):
+    permission_classes = [IsAuthenticated, IsUserCreator]
+
+    def post(self, request, supervision_id):
+        obj = get_object_or_404(SupervisedPack, pk=supervision_id, user=request.user)
+        if obj.supervision_status != 'Draft':
+            return Response(
+                {'error': 'Only draft packages can be sent'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        obj.supervision_status = 'Pending'
+        obj.save(update_fields=['supervision_status'])
+        serializer = SupervisedPackSerializer(obj)
+        return Response({
+            'message': 'Supervision request sent to guardian',
+            'data': serializer.data,
+        })
+
+
+class BeneficiaryViewSupevision(APIView):
+    permission_classes = [IsAuthenticated, IsBeneficiaryView]
+
+    def get(self, request, superivision_id):
+        supervision = get_object_or_404(SupervisedPack, pk=superivision_id)
+        if supervision.bene_id != request.user.id:
+            return Response(
+                {'error': 'Action Prohibited!'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        serializer = SupervisedPackSerializer(supervision)
+        return Response(serializer.data)

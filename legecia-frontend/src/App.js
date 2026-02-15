@@ -1,243 +1,104 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-/* ================= AUTH ================= */
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "context/AuthContext";
 import AuthGuard from "auth/AuthGuard";
-import RoleGuard from "auth/RoleGuard";
 import RoleRedirect from "auth/RoleRedirect";
-import VerifySuccess from "pages/VerifySuccess";
-/* ================= LAYOUT ================= */
 import CyberLayout from "components/layouts/CyberLayout";
 
-/* ================= PUBLIC ================= */
+// Public pages
+import Home from "pages/Home";
 import Login from "pages/Login";
 import Register from "pages/Register";
+import Verify from "pages/Verify";
+import VerifySuccess from "pages/VerifySuccess";
 
-/* ================= CORE ================= */
-import Home from "pages/Home";
-import Notification from "pages/Notification";
-import VerifyEmail from "pages/Verify";
-/* ================= DASHBOARDS ================= */
+// Dashboards
 import UserDashboard from "pages/UserDashboard";
 import GuardianDashboard from "pages/GuardianDashboard";
 import BeneficiaryDashboard from "pages/BeneficiaryDashboard";
 
-/* ================= SUPERVISION ================= */
+// Feature pages
+import PackagesPage from "pages/packages/PackagesPage";
+import NotificationPage from "pages/Notification";
+import CommunicationPage from "pages/communication/CommunicationPage";
+import CommunicationForm from "pages/communication/CommunicationForm";
+
+// Milestones
+import CreateMilestone from "pages/milestone/CreateMilestone";
+import MilestoneDetails from "pages/milestone/MilestoneDetails";
+import UploadMilestone from "pages/milestone/uploadMilestone";
+
+// Supervision
 import CreateSupervision from "pages/supervision/CreateSupervision";
 import GuardianReview from "pages/supervision/GuardianReview";
 
-/* ================= EXPLORER ================= */
+// Explorer
 import PublicPackageExplorer from "pages/explorer/PublicPackageExplorer";
 import CreateExplorerListing from "pages/explorer/CreateExplorerListing";
 import ExplorerDetail from "pages/explorer/ExplorerDetail";
 
-/* ================= COMMUNICATION ================= */
-import CommunicationPage from "pages/communication/CommunicationPage";
-
-/* ================= ADMIN ================= */
+// Admin
 import AccessLogsPage from "pages/admin/AccessLogsPage";
 import CredentialsPage from "pages/admin/CredentialsPage";
+import SystemLogsPage from "pages/admin/SystemLogsPage";
 
-function App() {
+function ProtectedLayout({ children }) {
   return (
-    <Router>
-      <Routes>
-
-        {/* ================= PUBLIC ================= */}
-        <Route
-          path="/login"
-          element={
-            <CyberLayout>
-              <Login />
-            </CyberLayout>
-          }
-        />
-
-        <Route
-          path="/register"
-          element={
-            <CyberLayout>
-              <Register />
-            </CyberLayout>
-          }
-        />
-        {/* ✅ EMAIL VERIFICATION (PUBLIC) */}
-<Route path="/verify/:uid/:token" element={<VerifyEmail />} />
-<Route path="/verify-success" element={<VerifySuccess />} />
-        {/* ================= ROLE REDIRECT ================= */}
-        <Route
-          path="/dashboard"
-          element={
-            <AuthGuard>
-              <RoleRedirect />
-            </AuthGuard>
-          }
-        />
-
-        {/* ================= HOME ================= */}
-        <Route
-          path="/"
-          element={
-            <AuthGuard>
-              <CyberLayout>
-                <Home />
-              </CyberLayout>
-            </AuthGuard>
-          }
-        />
-
-        {/* ================= USER ================= */}
-        <Route
-          path="/user/dashboard"
-          element={
-            <AuthGuard>
-              <RoleGuard role="USER">
-                <CyberLayout>
-                  <UserDashboard />
-                </CyberLayout>
-              </RoleGuard>
-            </AuthGuard>
-          }
-        />
-
-        <Route
-          path="/supervision/create"
-          element={
-            <AuthGuard>
-              <RoleGuard role="USER">
-                <CyberLayout>
-                  <CreateSupervision />
-                </CyberLayout>
-              </RoleGuard>
-            </AuthGuard>
-          }
-        />
-
-        {/* ================= GUARDIAN ================= */}
-        <Route
-          path="/guardian/dashboard"
-          element={
-            <AuthGuard>
-              <RoleGuard role="GUARDIAN">
-                <CyberLayout>
-                  <GuardianDashboard />
-                </CyberLayout>
-              </RoleGuard>
-            </AuthGuard>
-          }
-        />
-
-        <Route
-          path="/guardian/review"
-          element={
-            <AuthGuard>
-              <RoleGuard role="GUARDIAN">
-                <CyberLayout>
-                  <GuardianReview />
-                </CyberLayout>
-              </RoleGuard>
-            </AuthGuard>
-          }
-        />
-
-        {/* ================= BENEFICIARY ================= */}
-        <Route
-          path="/beneficiary/dashboard"
-          element={
-            <AuthGuard>
-              <RoleGuard role="BENEFICIARY">
-                <CyberLayout>
-                  <BeneficiaryDashboard />
-                </CyberLayout>
-              </RoleGuard>
-            </AuthGuard>
-          }
-        />
-        <Route
-          path="/notifications"
-          element={
-            <AuthGuard>
-              <CyberLayout>
-                <Notification />
-              </CyberLayout>
-            </AuthGuard>
-          }
-        />
-        {/* ================= COMMUNICATION ================= */}
-        <Route
-          path="/communication"
-          element={
-            <AuthGuard>
-              <CyberLayout>
-                <CommunicationPage />
-              </CyberLayout>
-            </AuthGuard>
-          }
-        />
-
-        {/* ================= EXPLORER ================= */}
-        <Route
-          path="/explorer"
-          element={
-            <AuthGuard>
-              <CyberLayout>
-                <PublicPackageExplorer />
-              </CyberLayout>
-            </AuthGuard>
-          }
-        />
-
-        <Route
-          path="/explorer/create"
-          element={
-            <AuthGuard>
-              <CyberLayout>
-                <CreateExplorerListing />
-              </CyberLayout>
-            </AuthGuard>
-          }
-        />
-
-        <Route
-          path="/explorer/:id"
-          element={
-            <AuthGuard>
-              <CyberLayout>
-                <ExplorerDetail />
-              </CyberLayout>
-            </AuthGuard>
-          }
-        />
-
-        {/* ================= ADMIN ================= */}
-        <Route
-          path="/admin/access-logs"
-          element={
-            <AuthGuard>
-              <RoleGuard role="ADMIN">
-                <CyberLayout>
-                  <AccessLogsPage />
-                </CyberLayout>
-              </RoleGuard>
-            </AuthGuard>
-          }
-        />
-
-        <Route
-          path="/admin/credentials"
-          element={
-            <AuthGuard>
-              <RoleGuard role="ADMIN">
-                <CyberLayout>
-                  <CredentialsPage />
-                </CyberLayout>
-              </RoleGuard>
-            </AuthGuard>
-          }
-        />
-
-      </Routes>
-    </Router>
+    <AuthGuard>
+      <CyberLayout>{children}</CyberLayout>
+    </AuthGuard>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public */}
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/verify/:uid/:token" element={<Verify />} />
+          <Route path="/verify-success" element={<VerifySuccess />} />
+
+          {/* Smart redirect based on role */}
+          <Route path="/dashboard" element={<AuthGuard><RoleRedirect /></AuthGuard>} />
+
+          {/* Dashboards */}
+          <Route path="/user/dashboard" element={<ProtectedLayout><UserDashboard /></ProtectedLayout>} />
+          <Route path="/guardian/dashboard" element={<ProtectedLayout><GuardianDashboard /></ProtectedLayout>} />
+          <Route path="/beneficiary/dashboard" element={<ProtectedLayout><BeneficiaryDashboard /></ProtectedLayout>} />
+
+          {/* Packages */}
+          <Route path="/packages" element={<ProtectedLayout><PackagesPage /></ProtectedLayout>} />
+
+          {/* Notifications */}
+          <Route path="/notifications" element={<ProtectedLayout><NotificationPage /></ProtectedLayout>} />
+
+          {/* Communication */}
+          <Route path="/communication" element={<ProtectedLayout><CommunicationPage /></ProtectedLayout>} />
+          <Route path="/communication/new" element={<ProtectedLayout><CommunicationForm /></ProtectedLayout>} />
+
+          {/* Milestones */}
+          <Route path="/milestone/create" element={<ProtectedLayout><CreateMilestone /></ProtectedLayout>} />
+          <Route path="/milestone/:id" element={<ProtectedLayout><MilestoneDetails /></ProtectedLayout>} />
+          <Route path="/milestone/:id/upload" element={<ProtectedLayout><UploadMilestone /></ProtectedLayout>} />
+
+          {/* Supervision */}
+          <Route path="/supervision/create" element={<ProtectedLayout><CreateSupervision /></ProtectedLayout>} />
+          <Route path="/supervision/review/:id" element={<ProtectedLayout><GuardianReview /></ProtectedLayout>} />
+
+          {/* Explorer */}
+          <Route path="/explorer" element={<ProtectedLayout><PublicPackageExplorer /></ProtectedLayout>} />
+          <Route path="/explorer/create" element={<ProtectedLayout><CreateExplorerListing /></ProtectedLayout>} />
+          <Route path="/explorer/:id" element={<ProtectedLayout><ExplorerDetail /></ProtectedLayout>} />
+
+          {/* Admin */}
+          <Route path="/admin/access-logs" element={<ProtectedLayout><AccessLogsPage /></ProtectedLayout>} />
+          <Route path="/admin/credentials" element={<ProtectedLayout><CredentialsPage /></ProtectedLayout>} />
+          <Route path="/admin/system-logs" element={<ProtectedLayout><SystemLogsPage /></ProtectedLayout>} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}

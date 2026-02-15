@@ -1,226 +1,183 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "../utils/api";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useNavigate, Link } from "react-router-dom";
+import API from "api/axios";
+import { motion } from "framer-motion";
 
 export default function Register() {
-  const [form, setForm] = useState({
-    username: "",
-    email: "",
-    password1: "",
-    password2: "",
-  });
-
-  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({ u_username: "", u_email: "", password: "" });
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // 👁 password visibility states
-  const [showPassword1, setShowPassword1] = useState(false);
-  const [showPassword2, setShowPassword2] = useState(false);
-
-  const submit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setMessage("");
+    setSuccess("");
     setLoading(true);
-
     try {
-  const res = await axios.post("/auth/register/", form);
-  setMessage(res.data.message || "Registration successful. Check your email.");
-} catch (err) {
-  const data = err.response?.data;
-
-  if (!data) {
-    setError("Server unavailable. Please try again.");
-  } else if (typeof data === "object") {
-    const messages = [];
-
-    Object.values(data).forEach((value) => {
-      if (Array.isArray(value)) messages.push(value[0]);
-      else if (typeof value === "string") messages.push(value);
-    });
-
-    setError(messages.join(" • "));
-  } else {
-    setError("Registration failed");
-  }
-}
-
- finally {
+      const res = await API.post("/register/", form);
+      setSuccess(res.data.message || "Registration successful! Check your email.");
+      setTimeout(() => navigate("/login"), 3000);
+    } catch (err) {
+      setError(err.response?.data?.error || err.response?.data?.u_email?.[0] || "Registration failed");
+    } finally {
       setLoading(false);
     }
   };
 
   return (
     <div style={pageStyle}>
-      <form onSubmit={submit} style={cardStyle}>
-        <h2 style={titleStyle}>Create Account</h2>
-        <p style={subtitleStyle}>
-          Secure your digital legacy with LEGECIA
-        </p>
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        style={cardStyle}
+      >
+        <h1 style={titleStyle}>⬡ LEGECIA</h1>
+        <p style={subtitleStyle}>Create Your Account</p>
 
         {error && <div style={errorStyle}>{error}</div>}
-        {message && <div style={successStyle}>{message}</div>}
+        {success && <div style={successStyle}>{success}</div>}
 
-        <input
-          style={inputStyle}
-          placeholder="Username"
-          value={form.username}
-          onChange={(e) =>
-            setForm({ ...form, username: e.target.value })
-          }
-          required
-        />
-
-        <input
-          style={inputStyle}
-          placeholder="Email address"
-          type="email"
-          value={form.email}
-          onChange={(e) =>
-            setForm({ ...form, email: e.target.value })
-          }
-          required
-        />
-
-        {/* 🔐 PASSWORD */}
-        <div style={{ position: "relative" }}>
+        <form onSubmit={handleSubmit}>
           <input
             style={inputStyle}
+            placeholder="Username"
+            value={form.u_username}
+            onChange={(e) => setForm({ ...form, u_username: e.target.value })}
+            required
+          />
+          <input
+            style={inputStyle}
+            type="email"
+            placeholder="Email"
+            value={form.u_email}
+            onChange={(e) => setForm({ ...form, u_email: e.target.value })}
+            required
+          />
+          <input
+            style={inputStyle}
+            type="password"
             placeholder="Password"
-            type={showPassword1 ? "text" : "password"}
-            value={form.password1}
-            onChange={(e) =>
-              setForm({ ...form, password1: e.target.value })
-            }
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
             required
           />
-          <span
-            onClick={() => setShowPassword1(!showPassword1)}
-            style={eyeStyle}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            style={btnStyle}
+            type="submit"
+            disabled={loading}
           >
-            {showPassword1 ? <FaEyeSlash /> : <FaEye />}
-          </span>
-        </div>
+            {loading ? "Creating Account..." : "Register →"}
+          </motion.button>
+        </form>
 
-        {/* 🔐 REPEAT PASSWORD */}
-        <div style={{ position: "relative" }}>
-          <input
-            style={inputStyle}
-            placeholder="Repeat password"
-            type={showPassword2 ? "text" : "password"}
-            value={form.password2}
-            onChange={(e) =>
-              setForm({ ...form, password2: e.target.value })
-            }
-            required
-          />
-          <span
-            onClick={() => setShowPassword2(!showPassword2)}
-            style={eyeStyle}
-          >
-            {showPassword2 ? <FaEyeSlash /> : <FaEye />}
-          </span>
-        </div>
-
-        <button type="submit" style={buttonStyle} disabled={loading}>
-          {loading ? "Creating account..." : "Create Account"}
-        </button>
-
-        <div style={footerStyle}>
-          Already have an account?
-          <Link to="/login" style={linkStyle}>
-            Sign in
-          </Link>
-        </div>
-      </form>
+        <p style={footerText}>
+          Already have an account?{" "}
+          <Link to="/login" style={linkStyle}>Sign In</Link>
+        </p>
+      </motion.div>
     </div>
   );
 }
 
-/* ================= STYLES ================= */
-
 const pageStyle = {
   minHeight: "100vh",
   display: "flex",
-  alignItems: "center",
   justifyContent: "center",
+  alignItems: "center",
+  background: "linear-gradient(135deg, #05040a 0%, #0a0e1a 50%, #0d0820 100%)",
 };
 
 const cardStyle = {
-  width: "380px",
-  padding: "30px",
-  border: "1px solid rgba(0,255,255,0.4)",
-  borderRadius: "12px",
-  backdropFilter: "blur(14px)",
+  width: "100%",
+  maxWidth: 400,
+  padding: "50px 40px",
+  borderRadius: "20px",
+  background: "rgba(12,10,30,0.85)",
+  border: "1px solid rgba(0,255,255,0.12)",
+  boxShadow: "0 0 60px rgba(0,255,255,0.06)",
+  backdropFilter: "blur(20px)",
 };
 
 const titleStyle = {
-  color: "#00ffff",
   textAlign: "center",
-  fontFamily: "sans-serif",
+  fontSize: "32px",
+  fontWeight: 800,
+  letterSpacing: "4px",
+  color: "#00ffff",
+  marginBottom: 4,
+  textShadow: "0 0 30px rgba(0,255,255,0.4)",
 };
 
 const subtitleStyle = {
-  color: "#cedadaff",
   textAlign: "center",
-  fontFamily: "sans-serif",
-  marginBottom: "20px",
+  color: "#6a6a9a",
+  fontSize: "13px",
+  letterSpacing: "2px",
+  marginBottom: 30,
 };
 
 const errorStyle = {
-  color: "#ff4d4d",
-  marginBottom: "15px",
+  background: "rgba(255,50,50,0.1)",
+  border: "1px solid rgba(255,50,50,0.3)",
+  color: "#ff6666",
+  padding: "10px",
+  borderRadius: "10px",
+  fontSize: "13px",
+  marginBottom: 16,
   textAlign: "center",
-    fontFamily: "sans-serif",
-
 };
 
 const successStyle = {
-  color: "#00ffff",
-  marginBottom: "15px",
+  background: "rgba(0,255,100,0.08)",
+  border: "1px solid rgba(0,255,100,0.3)",
+  color: "#00ff88",
+  padding: "10px",
+  borderRadius: "10px",
+  fontSize: "13px",
+  marginBottom: 16,
   textAlign: "center",
 };
 
 const inputStyle = {
   width: "100%",
-  fontFamily: "sans-serif",
-  padding: "20px",
-  marginBottom: "15px",
-  background: "transparent",
-  border: "1px solid rgba(0,255,255,0.4)",
-  color: "#00ffff",
+  padding: "14px 16px",
+  marginBottom: 16,
+  borderRadius: "12px",
+  border: "1px solid rgba(100,100,200,0.2)",
+  background: "rgba(255,255,255,0.03)",
+  color: "#e0e0ff",
+  fontSize: "15px",
+  outline: "none",
+  boxSizing: "border-box",
 };
 
-const eyeStyle = {
-  position: "absolute",
-  right: "12px",
-  top: "50%",
-  transform: "translateY(-50%)",
-  cursor: "pointer",
-  color: "#00ffff",
-};
-
-const buttonStyle = {
+const btnStyle = {
   width: "100%",
-  fontFamily: "Georgia",
-  padding: "12px",
-  background: "#00ffff",
+  padding: "14px",
+  borderRadius: "12px",
   border: "none",
+  background: "linear-gradient(135deg, #00c8ff, #7b2fff)",
+  color: "#fff",
+  fontWeight: 700,
+  fontSize: "15px",
   cursor: "pointer",
-  fontWeight: "bold",
+  marginTop: 8,
 };
 
-const footerStyle = {
-  marginTop: "20px",
-  fontFamily: "Impact",
+const footerText = {
   textAlign: "center",
-  color: "#f110d3ff",
+  marginTop: 24,
+  color: "#6a6a9a",
+  fontSize: "13px",
 };
 
 const linkStyle = {
-  marginLeft: "6px",
   color: "#00ffff",
   textDecoration: "none",
+  fontWeight: 600,
 };

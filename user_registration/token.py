@@ -9,11 +9,11 @@ def email_token(user):
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     token = default_token_generator.make_token(user)
 
-    verify_url = f"http://localhost:3000/verify/{uid}/{token}"
+    verify_url = f"{settings.FRONTEND_URL}/verify/{uid}/{token}"
 
     send_mail(
-        subject="Verify your email",
+        subject="Verify your email — LEGECIA",
         message=f"Click to verify your account:\n\n{verify_url}",
         from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
+        recipient_list=[user.u_email],
     )

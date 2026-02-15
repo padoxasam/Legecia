@@ -10,6 +10,10 @@ User = get_user_model()
 # REGISTER SERIALIZER
 # =========================
 class RegisterSerializer(serializers.ModelSerializer):
+    # 🔁 Map frontend → model
+    username = serializers.CharField(source="u_username")
+    email = serializers.EmailField(source="u_email")
+
     password1 = serializers.CharField(
         write_only=True,
         required=True,
@@ -28,13 +32,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ("username", "email", "password1", "password2")
 
     # ---------- EMAIL VALIDATION ----------
-    def validate_email(self, value):
-        if "@" not in value:
-            raise serializers.ValidationError("Invalid email address format")
-
-        if User.objects.filter(email__iexact=value).exists():
+    def validate_u_email(self, value):
+        if User.objects.filter(u_email__iexact=value).exists():
             raise serializers.ValidationError("Email already registered")
-
         return value
 
     # ---------- PASSWORD VALIDATION ----------
@@ -66,9 +66,9 @@ class RegisterSerializer(serializers.ModelSerializer):
     # ---------- MATCH PASSWORDS ----------
     def validate(self, attrs):
         if attrs["password1"] != attrs["password2"]:
-            raise serializers.ValidationError({
-                "password2": "Passwords do not match"
-            })
+            raise serializers.ValidationError(
+                {"password2": "Passwords do not match"}
+            )
         return attrs
 
     # ---------- CREATE USER ----------
@@ -76,12 +76,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         password = validated_data.pop("password1")
         validated_data.pop("password2")
 
-        user = User.objects.create_user(**validated_data)
-        user.set_password(password)
-
-        user.active_role = "USER"
-        user.email_verified = False
-        user.save()
+        user = User.objects.create_user(
+            u_username=validated_data["u_username"],
+            u_email=validated_data["u_email"],
+            password=password,
+            active_role="USER",
+        )
 
         return user
 
@@ -90,25 +90,25 @@ class RegisterSerializer(serializers.ModelSerializer):
 # LOGIN SERIALIZER
 # =========================
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
+    login = serializers.CharField(required=True)  # username OR email
     password = serializers.CharField(required=True, write_only=True)
 
     def validate(self, data):
-        username = data.get("username")
+        login = data.get("login")
         password = data.get("password")
 
-        if not username or not password:
+        if not login or not password:
             raise serializers.ValidationError("Both fields are required")
 
-        # Allow login with email or username
-        if "@" in username:
+        # 🔁 Email OR username login
+        if "@" in login:
             try:
-                user_obj = User.objects.get(email__iexact=username)
-                username = user_obj.username
+                user_obj = User.objects.get(u_email__iexact=login)
+                login = user_obj.u_username
             except User.DoesNotExist:
                 raise serializers.ValidationError("Invalid credentials")
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(username=login, password=password)
         if not user:
             raise serializers.ValidationError("Invalid credentials")
 
@@ -128,18 +128,16 @@ class RoleSwitchSerializer(serializers.Serializer):
 # =========================
 # UPDATE PROFILE SERIALIZER
 # =========================
-class UpdateProfileSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ["username", "email"]
+class UpdateProfileSerializer(serializers.Serializer):
+    username = serializers.CharField(required=False)
+    email = serializers.EmailField(required=False)
 
     def validate_email(self, value):
         user = self.instance
         if (
             User.objects
-            .filter(email__iexact=value)
-            .exclude(id=user.id)
+            .filter(u_email__iexact=value)
+            .exclude(reg_id=user.reg_id)
             .exists()
         ):
             raise serializers.ValidationError("Email already in use")
@@ -147,15 +145,14 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         email = validated_data.get("email")
+        username = validated_data.get("username")
 
-        # Reset email verification if email changes
-        if email and email != instance.email:
+        if email and email != instance.u_email:
             instance.email_verified = False
-            instance.email = email
+            instance.u_email = email
 
-        instance.username = validated_data.get(
-            "username", instance.username
-        )
+        if username:
+            instance.u_username = username
 
         instance.save()
         return instance

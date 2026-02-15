@@ -1,91 +1,109 @@
-/* =======================
-   Global Reset
-======================= */
-* {
+/* ========== LEGECIA — Global Cyber Theme ========== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
+html {
+  scroll-behavior: smooth;
 }
 
-/* =======================
-   Base Typography
-======================= */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-    "Helvetica Neue", sans-serif;
-
-  background: #0b0f1a; /* dark cyber background */
-  color: #f6fbff;
-  line-height: 1.5;
-
+  font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+  background: #05040a;
+  color: #e0e0ff;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
   overflow-x: hidden;
 }
 
-/* =======================
-   Root Container
-======================= */
 #root {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
-/* =======================
-   Code Blocks
-======================= */
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+/* ========== Scrollbar ========== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0e1a;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 255, 0.2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 255, 0.4);
 }
 
-/* =======================
-   Links
-======================= */
+/* ========== Links ========== */
 a {
-  color: #4fd1ff;
+  color: #00ffff;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
-
 a:hover {
-  text-decoration: underline;
+  color: #66ffff;
 }
 
-/* =======================
-   Inputs & Forms
-======================= */
-input,
-select,
-textarea,
+/* ========== Selection ========== */
+::selection {
+  background: rgba(0, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* ========== Inputs ========== */
+input, textarea, select {
+  font-family: inherit;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: rgba(0, 255, 255, 0.4) !important;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.08);
+}
+
+/* ========== Buttons ========== */
 button {
   font-family: inherit;
-  outline: none;
+  transition: all 0.2s ease;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-/* =======================
-   Scrollbar (optional)
-======================= */
-::-webkit-scrollbar {
-  width: 8px;
+/* ========== Utility Classes ========== */
+.glass-card {
+  background: rgba(12, 10, 30, 0.7);
+  border: 1px solid rgba(0, 255, 255, 0.08);
+  border-radius: 16px;
+  backdrop-filter: blur(16px);
+  padding: 24px;
 }
 
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.04);
+.neon-glow {
+  text-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(79, 209, 255, 0.4);
-  border-radius: 6px;
+.gradient-text {
+  background: linear-gradient(135deg, #00c8ff, #7b2fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(79, 209, 255, 0.6);
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-cyan {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.1); }
+  50%      { box-shadow: 0 0 30px rgba(0, 255, 255, 0.25); }
 }

@@ -1,31 +1,23 @@
-// src/layouts/CyberLayout.js
-import VantaBackground from "components/VantaBackground";
 import TopBar from "./TopBar";
 
-function CyberLayout({ children }) {
-
+export default function CyberLayout({ children }) {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        position: "relative", 
-        color: "#e0e0ff",
-        fontFamily: "Orbitron",
-        overflow: "hidden",
-      }}
-    >
-      <VantaBackground />
-
-      <div style={{ position: "relative", zIndex: 10 }}>
-        {/* ✅ SINGLE TOP BAR (no duplication) */}
-        <TopBar />
-
-        <div style={{ padding: "30px" }}>
-          {children}
-        </div>
-      </div>
+    <div style={wrapperStyle}>
+      <TopBar />
+      <main style={mainStyle}>{children}</main>
     </div>
   );
 }
 
-export default CyberLayout;
+const wrapperStyle = {
+  minHeight: "100vh",
+  background: "linear-gradient(135deg, #05040a 0%, #0a0e1a 50%, #0d0820 100%)",
+  color: "#e0e0ff",
+  fontFamily: "'Inter', 'Segoe UI', sans-serif",
+};
+
+const mainStyle = {
+  padding: "30px",
+  maxWidth: 1200,
+  margin: "0 auto",
+};

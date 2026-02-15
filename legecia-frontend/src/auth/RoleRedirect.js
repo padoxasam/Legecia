@@ -1,18 +1,14 @@
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useAuth } from "context/AuthContext";
+import { Navigate } from "react-router-dom";
 
 export default function RoleRedirect() {
   const { user } = useAuth();
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!user) return;
+  if (!user) return <Navigate to="/login" replace />;
 
-    if (user.active_role === "USER") navigate("/dashboard/user");
-    if (user.active_role === "GUARDIAN") navigate("/dashboard/guardian");
-    if (user.active_role === "BENEFICIARY") navigate("/dashboard/beneficiary");
-  }, [user, navigate]);
+  if (user.active_role === "USER") return <Navigate to="/user/dashboard" replace />;
+  if (user.active_role === "GUARDIAN") return <Navigate to="/guardian/dashboard" replace />;
+  if (user.active_role === "BENEFICIARY") return <Navigate to="/beneficiary/dashboard" replace />;
 
-  return null;
+  return <Navigate to="/" replace />;
 }
